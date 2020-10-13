@@ -37,7 +37,7 @@
     <dwc-api.version>1.27</dwc-api.version>
     <cache2k.version>1.2.4.Final</cache2k.version>
     <auto-service.version>1.0-rc7</auto-service.version>
-    <junit.version>4.11</junit.version>
+    <junit.version>4.13.1</junit.version>
   </properties>
 
   <!-- Required because we use the GBIF Term system -->
