@@ -10,16 +10,16 @@ You will need to install the libraries and indexes before using them.
 
 ### Indexes
 
-You can access pre-built search indexes at
+You can access pre-built search indexes at https://ala-nameindexes.s3.amazonaws.com/
 
 The current indexes are in `20230725-5`: 
-`index-20230725-5.zip` and `vernacular-20230725-5.zip`
+`linnanen-20230725-5.zip`, `vernacular-20230725-5.zip` and `location-20230725-5.zip`
 Generally, these are expected to be unzipped into the `/data/lucene` directory.
 
 #### Suggester Index
 
 The suggester index is used to provide auto-suggest options.
-If not present, the suggester i8ndex is built from search indexes
+If not present, the suggester index is built from search indexes
 on-demand, a process that can take 20 minutes or more.
 If the file `/data/tmp/suggester-20230725-5/suggester-metadata.json` exists and shows a later date than the source data,
 then the already built index in `/data/tmp/suggester-20230725-5` is used.
@@ -36,7 +36,7 @@ If you don't like the pre-built indexes, you can build a new index by using the
 `ala-distribution` archive and the following command:
 
 ```shell
-generate-linnaean.sh -o /data/lucene/index-XXX file:/data/combined-XXX
+generate-linnaean.sh -o /data/lucene/linnaean-XXX file:/data/combined-XXX
 generate-vernacular.sh -o /data/lucene/vernacular-XXX file:/data/combined-XXX
 ```
 
@@ -160,7 +160,7 @@ The standard match options are:
 * `normaliseTemplate` Clean up the template, canoncialise names and generally
   make the search template consistent with what is expected by the index.
   (default: true)
-* `canoncialDervications` Include dervations that are directly inferreable
+* `canoncialDerivations` Include derivations that are directly inferrable
   from the source data. (default: true)
   For example, a scientific name of *Acacia dealbata* imples a rank of species,
   a genus of *Acacia* and a specificEpithet of *dealbata*.

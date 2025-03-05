@@ -1,4 +1,4 @@
-# Redesign of the ala-name-matching library
+# Redesign of the ala-name-matching library [![Build Status](https://app.travis-ci.com/AtlasOfLivingAustralia/ala-name-matching-2.svg?token=t1YBnegG9jPq6jUYJY5W&branch=master)](https://app.travis-ci.com/AtlasOfLivingAustralia/ala-name-matching-2)
 
 See [here](doc/index.md) for documentation.
 
@@ -22,6 +22,12 @@ Linnaean and vernacular name indexes. You can get:
 * [location-20230725-5.zip](https://ala-nameindexes.s3.amazonaws.com/20230725-5/location-20230725-5.zip)
 
 These need to be unzipped into `/data/lucene`
+
+The name matching system will build a suggestion index from the other indexes  when it is first needed.
+This can take some time.
+If you don't want the system to build a suggestion index,
+there is a pre-built one at [suggester-20230725-5.zip](https://ala-nameindexes.s3.amazonaws.com/20230725-5/suggester-20230725-5.zip)
+which can be placed in `/data/tmp`.
 
 Every time the network definition changes, the indexes change, since the underlying
 inference model will have also changed.
