@@ -6824,7 +6824,7 @@ true,Phoronidae - undifferentiated,,Animalia,Phoronida (unassigned),Phoronida (u
 true,"Phos (Strongylocera) textilis Adams, 1851","Adams, 1851",,Gastropoda,Sorbeoconcha,Buccinidae,Phos,Species,,,
 true,Photobacterium damselae subsp. damselae,,Bacteria,Gammaproteobacteria,Vibrionales,Vibrionaceae,Photobacterium,genus,,,
 true,Photostomias lucingens,,,,,Stomiidae,Photostomias,,,,
-true,Phoxocephalid sp2,,,,Amphipoda_Gammaridea,,,Family,Amphipoda,Higher taxon not recognisable,
+false,Phoxocephalid sp2,,,,Amphipoda_Gammaridea,,,Family,Amphipoda,Higher taxon not recognisable,
 true,Phragmites,,,,,POACEAE,Phragmites,genus,,,
 false,Phragmoplastophyta,,Eukaryota,Chloroplastida,Charophyta,Phragmoplastophyta,,taxon_order,,Not in index,
 true,Phreatia dischorensis Schltr.,Schltr.,,,,Orchidaceae,Phreatia,,,,

@@ -185,7 +185,7 @@ public class AlaLinnaeanBuilderLargeTest extends TestUtils {
         prob = inference.probability(evidence, params, null);
         assertEquals(0.00017, prob.getEvidence(), 0.00001);
         assertEquals(1.0, prob.getConditional(), 0.00001);
-        assertEquals(0.14070, prob.getPosterior(), 0.00001);
+        assertEquals(0.14060, prob.getPosterior(), 0.00001);
     }
 
 

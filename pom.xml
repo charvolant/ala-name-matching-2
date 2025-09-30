@@ -53,20 +53,21 @@
     <targetJdk>11</targetJdk>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
-    <com.fasterxml.jackson.version>2.16.0</com.fasterxml.jackson.version>
-    <org.projectlombok.lombok.version>1.18.20</org.projectlombok.lombok.version>
-    <org.slf4j.version>1.7.36</org.slf4j.version>
+    <com.fasterxml.jackson.version>2.19.2</com.fasterxml.jackson.version>
+    <org.projectlombok.lombok.version>1.18.38</org.projectlombok.lombok.version>
+    <org.slf4j.version>2.0.17</org.slf4j.version>
     <maven.version>3.6.1</maven.version>
-    <commons-lang3.version>3.11</commons-lang3.version>
-    <commons-codec.version>1.14</commons-codec.version>
-    <commons-text.version>1.9</commons-text.version>
+    <commons-io.version>2.20.0</commons-io.version>
+    <commons-lang3.version>3.18.0</commons-lang3.version>
+    <commons-codec.version>1.19.0</commons-codec.version>
+    <commons-text.version>1.14.0</commons-text.version>
     <dwc-api.version>1.27</dwc-api.version>
     <cache2k.version>2.6.1.Final</cache2k.version>
-    <auto-service.version>1.0-rc7</auto-service.version>
-    <junit.version>4.13.1</junit.version>
-    <opencsv.version>5.0</opencsv.version>
-    <jcommander.version>1.78</jcommander.version>
-    <jts.version>1.16.1</jts.version>
+    <auto-service.version>1.1.1</auto-service.version>
+    <junit.version>4.13.2</junit.version>
+    <opencsv.version>5.12.0</opencsv.version>
+    <jcommander.version>2.0</jcommander.version>
+    <jts.version>1.20.0</jts.version>
     <old-name-matching.version>4.4-SNAPSHOT</old-name-matching.version>
   </properties>
 

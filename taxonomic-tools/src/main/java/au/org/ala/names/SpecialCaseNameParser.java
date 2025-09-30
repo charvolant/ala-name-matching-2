@@ -98,6 +98,7 @@ public class SpecialCaseNameParser {
         csv.writeNext(header, false);
         for (String name: this.parses.keySet().stream().sorted().collect(Collectors.toList())) {
             ParsedName pn = this.parses.get(name);
+            NomCode code = pn.getCode();
             String[] line = new String[used.size()];
             int i = 0;
             for (Column<?> column: used) {
@@ -111,7 +112,7 @@ public class SpecialCaseNameParser {
                 pa.setCombinationAuthorship(pn.getCombinationAuthorship());
                 pa.setSanctioningAuthor(pn.getSanctioningAuthor());
                 if (pa.hasAuthorship())
-                    line[line.length - 1] = NameFormatter.authorshipComplete(pa);
+                    line[line.length - 1] = NameFormatter.authorshipComplete(pa, code);
             }
             csv.writeNext(line, false);
         }
