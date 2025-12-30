@@ -14,6 +14,7 @@ public class Network9Cli extends AbstractCli<Network9Classification, Network9Bui
     IndexBuilderConfiguration configuration = new IndexBuilderConfiguration();
     configuration.setBuilderClass(Network9Builder.class);
     configuration.setFactoryClass(Network9Factory.class);
+    configuration.setBuildAnalyserClass(au.org.ala.test.TestBuildAnalyser.class);
     configuration.setWeightAnalyserClass(au.org.ala.names.builder.DefaultWeightAnalyser.class);
     configuration.setNetwork(Network9Builder.class.getResource("network-9.json"));
     configuration.setTypes(Arrays.asList(Network9Factory.CONCEPT));

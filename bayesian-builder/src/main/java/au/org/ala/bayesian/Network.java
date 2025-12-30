@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A network for bayesian inference,
@@ -235,12 +236,12 @@ public class Network extends Identifiable {
         }
     }
 
+    // Must be in supplied order, since otherwise we get illegal forward references
     @JsonProperty("modifications")
     public List<Modifier> getModifications() {
-        Set<Modifier> mods = this.sourceModifiers.stream().flatMap(List::stream).collect(Collectors.toSet());
-        mods.addAll(this.matchModifiers.stream().flatMap(List::stream).collect(Collectors.toSet()));
-        List<Modifier> modifiers = new ArrayList<>(mods);
-        modifiers.sort(Comparator.comparing(Identifiable::getId));
+        List<Modifier> smods = this.sourceModifiers.stream().flatMap(ms -> ms.stream().flatMap(m -> m.getAllModifiers().stream())).collect(Collectors.toList());
+        List<Modifier> mmods = this.matchModifiers.stream().flatMap(ms -> ms.stream().flatMap(m -> m.getAllModifiers().stream())).collect(Collectors.toList());
+        List<Modifier> modifiers = Stream.concat(mmods.stream(), smods.stream()).distinct().collect(Collectors.toList());
         return modifiers;
     }
 

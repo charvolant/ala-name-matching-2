@@ -13,6 +13,7 @@ public class GrassCli extends AbstractCli<GrassClassification, GrassBuilder, Gra
     IndexBuilderConfiguration configuration = new IndexBuilderConfiguration();
     configuration.setBuilderClass(GrassBuilder.class);
     configuration.setFactoryClass(GrassFactory.class);
+    configuration.setBuildAnalyserClass(au.org.ala.names.builder.NullBuildAnalyser.class);
     configuration.setWeightAnalyserClass(au.org.ala.names.builder.DefaultWeightAnalyser.class);
     configuration.setNetwork(GrassBuilder.class.getResource("grass.json"));
     configuration.setTypes(Arrays.asList(GrassFactory.CONCEPT));

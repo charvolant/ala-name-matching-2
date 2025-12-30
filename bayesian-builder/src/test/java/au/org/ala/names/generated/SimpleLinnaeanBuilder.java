@@ -5,6 +5,7 @@ import au.org.ala.bayesian.BayesianException;
 import au.org.ala.bayesian.Classifier;
 import au.org.ala.bayesian.ParameterAnalyser;
 import au.org.ala.bayesian.Parameters;
+import au.org.ala.names.builder.BuildAnalyser;
 import au.org.ala.names.builder.Builder;
 
 import java.util.ArrayList;
@@ -50,15 +51,15 @@ public class SimpleLinnaeanBuilder implements Builder<SimpleLinnaeanClassificati
   }
 
   @Override
-  public void generate(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void generate(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
   }
 
   @Override
-  public void interpret(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void interpret(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
   }
 
   @Override
-  public void infer(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void infer(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
       if (!classifier.has(SimpleLinnaeanFactory.soundexScientificName)) {
         java.lang.String i_0 = classifier.get(SimpleLinnaeanFactory.scientificName);
         java.lang.String v_0 = this.soundex.soundex((String) i_0);
@@ -81,7 +82,7 @@ public class SimpleLinnaeanBuilder implements Builder<SimpleLinnaeanClassificati
   }
 
   @Override
-  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
       Classifier d_0;
       if (classifier.getAll(SimpleLinnaeanFactory.taxonRank).stream().anyMatch(x -> "genus".equals(x)))
           d_0 = classifier;
@@ -166,7 +167,7 @@ public class SimpleLinnaeanBuilder implements Builder<SimpleLinnaeanClassificati
   }
 
   @Override
-  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
     List<Function<Classifier, Boolean>> broadeners = new ArrayList<>();
     if (document.getAll(SimpleLinnaeanFactory.taxonRank).stream().anyMatch(x -> "family".equals(x))) {
       broadeners.add(c -> (c.getAll(SimpleLinnaeanFactory.taxonRank).stream().anyMatch(x -> "superfamily".equals(x))) || (c.getAll(SimpleLinnaeanFactory.taxonRank).stream().anyMatch(x -> "subfamily".equals(x))));

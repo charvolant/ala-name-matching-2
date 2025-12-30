@@ -32,10 +32,11 @@ public interface Builder<C extends Classification<C>> {
      *
      * @param classifier The document
      * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      *
      * @throws BayesianException if unable to calculate the inference
       */
-    void generate(Classifier classifier, Analyser<C> analyser) throws BayesianException;
+    void generate(Classifier classifier, Analyser<C> analyser, BuildAnalyser<C> buildAnalyser) throws BayesianException;
 
     /**
      * Interpret values in a classifier.
@@ -45,10 +46,11 @@ public interface Builder<C extends Classification<C>> {
      *
      * @param classifier The document
      * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      *
      * @throws BayesianException if unable to calculate the inference
      */
-    void interpret(Classifier classifier, Analyser<C> analyser) throws BayesianException;
+    void interpret(Classifier classifier, Analyser<C> analyser, BuildAnalyser<C> buildAnalyser) throws BayesianException;
 
     /**
      * Infer from a classifier during building.
@@ -58,10 +60,11 @@ public interface Builder<C extends Classification<C>> {
      *
      * @param classifier The document
      * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      *
      * @throws BayesianException if unable to calculate the inference
       */
-    void infer(Classifier classifier, Analyser<C> analyser) throws BayesianException;
+    void infer(Classifier classifier, Analyser<C> analyser, BuildAnalyser<C> buildAnalyser) throws BayesianException;
 
     /**
      * Expand a classifier during building.
@@ -72,22 +75,24 @@ public interface Builder<C extends Classification<C>> {
      * @param document The classifier
      * @param parents The classifier's parents
      * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      *
      * @throws BayesianException if unable to calculate the expansion
     */
-    void expand(Classifier document, Deque<Classifier> parents, Analyser<C> analyser) throws BayesianException;
+    void expand(Classifier document, Deque<Classifier> parents, Analyser<C> analyser, BuildAnalyser<C> buildAnalyser) throws BayesianException;
 
     /**
      * Get any broadener for thisd classifier.
      *
      * @param document The document to be broadened
      * @param analyser An analyster
+     * @param buildAnalyser The builder analyser
      *
      * @return A function that takes another classification and determines whether to use it to broaden the original classifier
      *
      * @throws BayesianException if unable to determine the broadening.
      */
-    Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<C> analyser) throws BayesianException;
+    Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<C> analyser, BuildAnalyser<C> buildAnalyser) throws BayesianException;
 
     /**
      * Build a signture for a classifier.

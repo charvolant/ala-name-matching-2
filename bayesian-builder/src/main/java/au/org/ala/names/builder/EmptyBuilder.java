@@ -24,36 +24,45 @@ public class EmptyBuilder implements Builder {
      * Null generator
      *
      * @param classifier The classifier
+     * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      */
     @Override
-    public void generate(Classifier classifier, Analyser analyser) {
+    public void generate(Classifier classifier, Analyser analyser, BuildAnalyser buildAnalyser) {
     }
 
     /**
      * Null interpretation
      *
      * @param classifier The classifier
+     * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      */
     @Override
-    public void interpret(Classifier classifier, Analyser analyser) {
+    public void interpret(Classifier classifier, Analyser analyser, BuildAnalyser buildAnalyser) {
     }
 
     /**
      * Null inference
      *
      * @param classifier The classifier
+     * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      */
     @Override
-    public void infer(Classifier classifier, Analyser analyser) {
+    public void infer(Classifier classifier, Analyser analyser, BuildAnalyser buildAnalyser) {
     }
 
     /**
      * Null expansion
-     *  @param classifier The classifier
+     *
+     * @param classifier The classifier
      * @param parents  The classifiers parents
+     * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      */
     @Override
-    public void expand(Classifier classifier, Deque parents, Analyser analyser) {
+    public void expand(Classifier classifier, Deque parents, Analyser analyser, BuildAnalyser buildAnalyser) {
     }
 
     /**
@@ -61,12 +70,14 @@ public class EmptyBuilder implements Builder {
      *
      * @param document The document to be broadened
      * @param analyser An analyster
+     * @param analyser The document analyser
+     * @param buildAnalyser The builder analyser
      *
      * @return
      * @throws BayesianException
      */
     @Override
-    public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser analyser) throws BayesianException {
+    public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser analyser, BuildAnalyser buildAnalyser) throws BayesianException {
         return null;
     }
 

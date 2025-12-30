@@ -5,6 +5,7 @@ import au.org.ala.bayesian.BayesianException;
 import au.org.ala.bayesian.Classifier;
 import au.org.ala.bayesian.ParameterAnalyser;
 import au.org.ala.bayesian.Parameters;
+import au.org.ala.names.builder.BuildAnalyser;
 import au.org.ala.names.builder.Builder;
 
 import java.util.ArrayList;
@@ -39,23 +40,23 @@ public class GrassBuilder implements Builder<GrassClassification> {
   }
 
   @Override
-  public void generate(Classifier classifier, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void generate(Classifier classifier, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
   }
 
   @Override
-  public void interpret(Classifier classifier, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void interpret(Classifier classifier, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
   }
 
   @Override
-  public void infer(Classifier classifier, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void infer(Classifier classifier, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
   }
 
   @Override
-  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
   }
 
   @Override
-  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<GrassClassification> analyser) throws BayesianException {
+  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
     List<Function<Classifier, Boolean>> broadeners = new ArrayList<>();
     return broadeners.isEmpty() ? null : (c -> broadeners.stream().anyMatch(b -> b.apply(c)));
   }

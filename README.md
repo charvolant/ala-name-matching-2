@@ -17,16 +17,16 @@ narrowing conditional probabilities to the smallest possible set of antecendents
 To use the test cases in ala-linnaean module, you will need the corresponding
 Linnaean and vernacular name indexes. You can get:
 
-* [linnaean-20230725-5.zip](https://ala-nameindexes.s3.amazonaws.com/20230725-5/linnaean-20230725-5.zip)
-* [vernacular-20230725-5.zip](https://ala-nameindexes.s3.amazonaws.com/20230725-5/vernacular-20230725-5.zip)
-* [location-20230725-5.zip](https://ala-nameindexes.s3.amazonaws.com/20230725-5/location-20230725-5.zip)
+* [linnaean-2025-1-3.zip](https://ala-nameindexes.s3.amazonaws.com/2025-1-3/linnaean-2025-1-3.zip)
+* [vernacular-2025-1-3.zip](https://ala-nameindexes.s3.amazonaws.com/2025-1-3/vernacular-2025-1-3.zip)
+* [location-2025-1-3.zip](https://ala-nameindexes.s3.amazonaws.com/2025-1-3/location-2025-1-3.zip)
 
 These need to be unzipped into `/data/lucene`
 
 The name matching system will build a suggestion index from the other indexes  when it is first needed.
 This can take some time.
 If you don't want the system to build a suggestion index,
-there is a pre-built one at [suggester-20230725-5.zip](https://ala-nameindexes.s3.amazonaws.com/20230725-5/suggester-20230725-5.zip)
+there is a pre-built one at [suggester-2025-1-3.zip](https://ala-nameindexes.s3.amazonaws.com/2025-1-3/suggester-2025-1-3.zip)
 which can be placed in `/data/tmp`.
 
 Every time the network definition changes, the indexes change, since the underlying

@@ -818,6 +818,15 @@
       },
       "normaliser": "simple_normaliser",
       "style": "PHRASE"
+    },
+    {
+      "id": "datasetID",
+      "label": "dsID",
+      "uri": "http://rs.tdwg.org/dwc/terms/datasetID",
+      "properties": {
+        "http://ala.org.au/bayesian/1.0/additional": true
+      },
+      "style": "IDENTIFIER"
     }
   ],
   "vertices": [
@@ -1423,62 +1432,6 @@
     },
     {
       "@class": "au.org.ala.bayesian.modifier.RemoveModifier",
-      "id": "remove_middle_ranks_1",
-      "issues": [
-        "removed_order",
-        "removed_class",
-        "removed_phylum"
-      ],
-      "condition" : {
-        "@class" : "au.org.ala.bayesian.condition.PresentCondition",
-        "all": false,
-        "present": [
-          "kingdom",
-          "family"
-        ]
-      },
-      "observables": [
-        "order",
-        "soundexOrder",
-        "class",
-        "soundexClass",
-        "phylum",
-        "soundexPhylum"
-      ]
-    },
-    {
-      "@class": "au.org.ala.bayesian.modifier.RemoveModifier",
-      "id": "remove_middle_ranks_2",
-      "issues": [
-        "removed_family",
-        "removed_order"
-      ],
-      "condition" : {
-        "@class" : "au.org.ala.bayesian.condition.PresentCondition",
-        "all": false,
-        "present": [
-          "kingdom",
-          "phylum",
-          "class"
-        ]
-      },
-      "observables": [
-        "family",
-        "soundexFamily",
-        "order",
-        "soundexOrder"
-      ]
-    },
-    {
-      "@class": "au.org.ala.bayesian.modifier.RemoveModifier",
-      "id": "remove_location",
-      "issues": ["removed_location"],
-      "observables": [
-        "locationID"
-      ]
-    },
-    {
-      "@class": "au.org.ala.bayesian.modifier.RemoveModifier",
       "id": "remove_family",
       "issues": ["removed_family"],
       "observables": [
@@ -1511,6 +1464,52 @@
       "observables": [
         "phylum",
         "soundexPhylum"
+      ]
+    },
+    {
+      "@class": "au.org.ala.bayesian.modifier.CompositeModifier",
+      "id": "remove_middle_ranks_1",
+      "anyModifier": true,
+      "condition" : {
+        "@class" : "au.org.ala.bayesian.condition.PresentCondition",
+        "all": false,
+        "present": [
+          "kingdom",
+          "family"
+        ]
+      },
+      "clearDerived": true,
+      "modifiers": [
+        "remove_phylum",
+        "remove_class",
+        "remove_order"
+      ]
+    },
+    {
+      "@class": "au.org.ala.bayesian.modifier.CompositeModifier",
+      "id": "remove_middle_ranks_2",
+      "anyModifier": true,
+      "condition" : {
+        "@class" : "au.org.ala.bayesian.condition.PresentCondition",
+        "all": false,
+        "present": [
+          "kingdom",
+          "phylum",
+          "class"
+        ]
+      },
+      "clearDerived": true,
+      "modifiers": [
+        "remove_order",
+        "remove_family"
+      ]
+    },
+    {
+      "@class": "au.org.ala.bayesian.modifier.RemoveModifier",
+      "id": "remove_location",
+      "issues": ["removed_location"],
+      "observables": [
+        "locationID"
       ]
     },
     {
@@ -1889,6 +1888,10 @@
     [
       "canonical_scientific_name",
       "remove_location",
+      "remove_phylum",
+      "remove_class",
+      "remove_order",
+      "remove_family",
       "remove_middle_ranks_1",
       "remove_middle_ranks_2",
       "misspelled_scientific_name_base",

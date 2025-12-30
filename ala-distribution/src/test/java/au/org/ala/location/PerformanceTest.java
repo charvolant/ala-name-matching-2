@@ -4,16 +4,11 @@ import au.org.ala.bayesian.ClassificationMatcherConfiguration;
 import au.org.ala.bayesian.Match;
 import au.org.ala.bayesian.MatchMeasurement;
 import au.org.ala.bayesian.MatchOptions;
-import au.org.ala.names.ALANameSearcher;
-import au.org.ala.names.AlaLinnaeanClassification;
-import au.org.ala.names.AlaLinnaeanFactory;
-import au.org.ala.names.RankAnalysis;
 import au.org.ala.names.lucene.LuceneClassifierSearcher;
 import au.org.ala.names.lucene.LuceneClassifierSearcherConfiguration;
 import au.org.ala.vocab.GeographyType;
 import org.apache.commons.lang3.StringUtils;
 import org.gbif.dwc.terms.Term;
-import org.gbif.nameparser.api.Rank;
 import org.gbif.utils.file.csv.CSVReader;
 import org.gbif.utils.file.csv.CSVReaderFactory;
 import org.junit.After;
@@ -26,7 +21,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +35,7 @@ public class PerformanceTest {
 
     public static final int SEARCH_QUERY_LIMIT = 15;
     public static final int SEARCH_CACHE_SIZE = 10000;
-    public static final String LOCATION_INDEX = "/data/lucene/location-20230725-5";
+    public static final String LOCATION_INDEX = "/data/lucene/location-2025-1-3";
 
 
     private LuceneClassifierSearcher searcher;

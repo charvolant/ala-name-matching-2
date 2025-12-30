@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
+import lombok.SneakyThrows;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 import org.slf4j.Logger;
@@ -14,10 +15,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Configuration options for a name analyser.
@@ -35,14 +37,68 @@ public class AnalyserConfig {
     public static final String DEFAULT_CONFIG_FILE_NAME = "analyser-config.json";
 
     /**
-     * The source of any special case data that the anayser might need.
-     * <p>
-     * A URL to an analyser-specific resource.
-     * If null, the default, then no special case information is present.
+     * Any simple string parameters that are specified.
      */
     @JsonProperty
     @Builder.Default
-    private URL specialCases = null;
+    private Map<String, String> parameters = new HashMap<>();
+
+    /**
+     * Any URL parameters that are specified.
+     */
+    @JsonProperty
+    @Builder.Default
+    private Map<String, URL> urls = new HashMap<>();
+
+    /**
+     * Add a simple string parameter to the configuration
+     *
+     * @param key The parameter key
+     * @param value The parameter value
+     */
+    public AnalyserConfig with(String key, String value) {
+        Map<String, String> np = new HashMap<>(this.parameters);
+        np.put(key, value);
+        return AnalyserConfig.builder()
+                .parameters(np)
+                .urls(this.urls)
+                .build();
+    }
+
+    /**
+     * Get a parameter from the configuration
+     *
+     * @param key The parameter key
+     * @param dflt The default value
+     */
+    public String getParameter(String key, String dflt) {
+        return this.parameters.getOrDefault(key, dflt);
+    }
+
+    /**
+     * Add a simple string parameter to the configuration
+     *
+     * @param key The parameter key
+     * @param value The parameter value
+     */
+    public AnalyserConfig with(String key, URL value) {
+        Map<String, URL> nu = new HashMap<>(this.urls);
+        nu.put(key, value);
+        return AnalyserConfig.builder()
+                .parameters(this.parameters)
+                .urls(nu)
+                .build();
+    }
+
+    /**
+     * Get a URL parameter from the configuration
+     *
+     * @param key The parameter key
+     * @param dflt The default value
+     */
+    public URL getURL(String key, URL dflt) {
+        return this.urls.getOrDefault(key, dflt);
+    }
 
     /**
      * Store the configuration.
@@ -55,6 +111,31 @@ public class AnalyserConfig {
     }
 
     /**
+     * Relativise a URL with respect to a directory
+     *
+     * @param base The base URL
+     * @param directory The directory
+     *
+     * @return The relativised URL
+     *
+     * @throws IOException if unable to construct the URL
+     */
+    @SneakyThrows(IOException.class)
+    private URL relative(URL base, File directory) {
+        if (base != null && base.getProtocol().equals("file")) {
+            try {
+                Path sp = Paths.get(base.getPath()).normalize();
+                Path dp = directory.toPath().normalize();
+                if (sp.startsWith(dp))
+                    base = new URL("file:" + dp.relativize(sp).toString());
+            } catch (Exception ex) {
+                throw new IOException("Unable to rebase " + base + " against " + directory, ex);
+            }
+        }
+        return base;
+    }
+
+    /**
      * Create a configuration relative to a directory.
      *
      * @param directory The directory
@@ -62,22 +143,36 @@ public class AnalyserConfig {
      * @throws IOException if unable to relativise the configuration
      */
     public AnalyserConfig relative(File directory) throws IOException {
-        URL rebasedSpecialCases = this.specialCases;
-        if (rebasedSpecialCases != null && rebasedSpecialCases.getProtocol().equals("file")) {
-            try {
-                Path sp = Paths.get(rebasedSpecialCases.getPath()).normalize();
-                Path base = directory.toPath().normalize();
-                if (sp.startsWith(base))
-                    rebasedSpecialCases = new URL("file:" + base.relativize(sp).toString());
-            } catch (Exception ex) {
-                throw new IOException("Unable to rebase " + rebasedSpecialCases + " against " + directory, ex);
-            }
-        }
+        Map<String, URL> rebased = this.urls.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toMap(e -> e.getKey(), e -> this.relative(e.getValue(), directory)));
         return AnalyserConfig.builder()
-                .specialCases(rebasedSpecialCases)
+                .parameters(this.parameters)
+                .urls(rebased)
                 .build();
     }
 
+    /**
+     * Absolutise a URL with respect to a directory
+     *
+     * @param base The base URL
+     * @param directory The directory
+     *
+     * @return The relativised URL
+     *
+     * @throws IOException if unable to construct the URL
+     */
+    @SneakyThrows(IOException.class)
+    private URL absolute(URL base, File directory) {
+        if (base != null && base.getProtocol().equals("file")) {
+            try {
+                Path sp = Paths.get(base.getPath()).normalize();
+                Path dp = directory.toPath().normalize();
+                base = dp.resolve(sp).toUri().toURL();
+            } catch (Exception ex) {
+                throw new IOException("Unable to absolutise " + base + " against " + directory, ex);
+            }
+        }
+        return base;
+    }
 
     /**
      * Create a configuration with absolute paths.
@@ -85,25 +180,15 @@ public class AnalyserConfig {
      *
      * @param directory The directory that forms the base
      *
-     * @return The absolute
-     * configuration
-     * @throws IOException if unable to make the configuration absolute
+     * @return The absolute configuration
      */
-    public AnalyserConfig absolute(File directory) throws IOException {
-        URL rebasedSpecialCases = this.specialCases;
-        if (rebasedSpecialCases != null && rebasedSpecialCases.getProtocol().equals("file")) {
-            try {
-                Path sp = Paths.get(rebasedSpecialCases.getPath()).normalize();
-                Path base = directory.toPath().normalize();
-                rebasedSpecialCases = base.resolve(sp).toUri().toURL();
-            } catch (Exception ex) {
-                throw new IOException("Unable to rebase " + rebasedSpecialCases + " against " + directory, ex);
-            }
+    public AnalyserConfig absolute(File directory)  {
+            Map<String, URL> rebased = this.urls.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toMap(e -> e.getKey(), e -> this.absolute(e.getValue(), directory)));
+            return AnalyserConfig.builder()
+                    .parameters(this.parameters)
+                    .urls(rebased)
+                    .build();
         }
-        return AnalyserConfig.builder()
-                .specialCases(rebasedSpecialCases)
-                .build();
-    }
 
     /**
      * Load an analyser configuration from a directory.

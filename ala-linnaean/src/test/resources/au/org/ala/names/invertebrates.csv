@@ -5,25 +5,28 @@ Red-headed Mouse Spider,,Animalia,Arthropoda,Arachnida,ARANEAE,ACTINOPODIDAE,Mis
 Priam's Birdwing,,Animalia,Arthropoda,Insecta,LEPIDOPTERA,PAPILIONIDAE,Ornithoptera,priamus,,true
 Cairns Birdwing,,Animalia,Arthropoda,Insecta,LEPIDOPTERA,PAPILIONIDAE,Ornithoptera,euphorion,,true
 Cabbage White Butterfly,,Animalia,Arthropoda,Insecta,LEPIDOPTERA,PIERIDAE,Pieris,rapae,,true
-Common Brown Butterfly,,Animalia,Arthropoda,Insecta,LEPIDOPTERA,NYMPHALIDAE,Heteronympha,merope,,true
+Common Brown,,Animalia,Arthropoda,Insecta,LEPIDOPTERA,NYMPHALIDAE,Heteronympha,merope,,true
 Fiddler Beetle,,Animalia,Arthropoda,Insecta,COLEOPTERA,SCARABAEIDAE,Eupoecila,australasiae,,true
 Botany Bay Weevil,,Animalia,Arthropoda,Insecta,COLEOPTERA,,Chrysolopus,spectabilis,,true
 Transverse Ladybird,,Animalia,Arthropoda,Insecta,COLEOPTERA,COCCINELLIDAE,Coccinella,transversalis,,true
 Lord Howe Island Stick-insect,,Animalia,Arthropoda,Insecta,PHASMIDA,PHASMATIDAE,Dryococelus,australis,,true
-Goliath Stick Insect,,Animalia,Arthropoda,Insecta,PHASMIDA,PHASMATIDAE,Clemacantha,goliath,,true
+# Not present in 2025-1-3
+# Goliath Stick Insect,,Animalia,Arthropoda,Insecta,PHASMIDA,PHASMATIDAE,Clemacantha,goliath,,true
 Giant Burrowing Cockroach,,Animalia,Arthropoda,Insecta,BLATTODEA,BLABERIDAE,Macropanesthia,rhinoceros,,true
 Green Tree Ant,,Animalia,Arthropoda,Insecta,HYMENOPTERA,FORMICIDAE,Oecophylla,smaragdina,,true
-Great Carpenter Bee,,Animalia,Arthropoda,Insecta,HYMENOPTERA,APIDAE,Xylocopa,aruana,,true
-Carpenter Bee,,Animalia,Arthropoda,Insecta,HYMENOPTERA,APIDAE,Xylocopa,,,true
+# Not present in 2025-1-3
+##Great Carpenter Bee,,Animalia,Arthropoda,Insecta,HYMENOPTERA,APIDAE,Xylocopa,aruana,,true
+Carpenter Bee,,Animalia,Arthropoda,Insecta,HYMENOPTERA,APIDAE,Xylocopa,aruana,,true
 Common Paper Wasp,,Animalia,Arthropoda,Insecta,HYMENOPTERA,VESPIDAE,Polistes,humilis,,true
-Red eye Cicada,,Animalia,Arthropoda,Insecta,HEMIPTERA,CICADIDAE,Psaltoda,moerens,,true
+Red Eye,,Animalia,Arthropoda,Insecta,HEMIPTERA,CICADIDAE,Psaltoda,moerens,,true
 Greengrocer (Green Form),,Animalia,Arthropoda,Insecta,HEMIPTERA,CICADIDAE,Cyclochila,australasiae,,true
 Southern Blue-Ringed Octopus,,Animalia,MOLLUSCA,CEPHALOPODA,OCTOPODA,OCTOPODIDAE,Hapalochlaena,maculosa,,true
-Humped Golden Orb-Weaving Spider,,Animalia,Arthropoda,Arachnida,ARANEAE,Araneidae,Nephila,plumipes,,true
-White-tailed Spider,,Animalia,Arthropoda,Arachnida,ARANEAE,LAMPONIDAE,Lampona,cylindrata,,true
+Humped Golden Orb-Weaving Spider,,Animalia,Arthropoda,Arachnida,ARANEAE,Araneidae,Trichonephila,plumipes,,true
+White-tailed Spider,,Animalia,Arthropoda,Arachnida,ARANEAE,LAMPONIDAE,Lamponella,ainslie,,true
 Bogong Moth,,Animalia,Arthropoda,Insecta,LEPIDOPTERA,NOCTUIDAE,Agrotis,infusa,,true
 Box jellyfish,,Animalia,,,,,Copula,sivickisi,,true
-# Irukandji not present in 20230725-3
-# Irukandji,,Animalia,,,,,Carukia,barnesi,,false
-Portuguese Man-of-War,,Animalia,,,,,Physalia,physalis,,true
+# Not present in 2025-1-3
+# Irukandji,,Animalia,,,,,Carukia,barnesi,,true
+# Not present in 2025-1-3
+# Portuguese Man-of-War,,Animalia,,,,,Physalia,physalis,,true
 Huntsman Spiders,,Animalia,Arthropoda,Arachnida,ARANEAE,SPARASSIDAE,,,,true

@@ -6,6 +6,7 @@ import au.org.ala.bayesian.BayesianException;
 import au.org.ala.bayesian.Classifier;
 import au.org.ala.bayesian.ParameterAnalyser;
 import au.org.ala.bayesian.Parameters;
+import au.org.ala.names.builder.BuildAnalyser;
 import au.org.ala.names.builder.Builder;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class ${className} implements Builder<${classificationClassName}> {
   }
 
   @Override
-  public void generate(Classifier classifier, Analyser<${classificationClassName}> analyser) throws BayesianException {
+  public void generate(Classifier classifier, Analyser<${classificationClassName}> analyser, BuildAnalyser<${classificationClassName}> buildAnalyser) throws BayesianException {
 <#list derivationOrder as observable>
     <#assign derivation = observable.derivation>
     <#if derivation.generator>
@@ -77,7 +78,7 @@ public class ${className} implements Builder<${classificationClassName}> {
   }
 
   @Override
-  public void interpret(Classifier classifier, Analyser<${classificationClassName}> analyser) throws BayesianException {
+  public void interpret(Classifier classifier, Analyser<${classificationClassName}> analyser, BuildAnalyser<${classificationClassName}> buildAnalyser) throws BayesianException {
 <#list derivationOrder as observable>
     <#assign derivation = observable.derivation >
     <#if derivation.preAnalysis>
@@ -122,7 +123,7 @@ public class ${className} implements Builder<${classificationClassName}> {
   }
 
   @Override
-  public void infer(Classifier classifier, Analyser<${classificationClassName}> analyser) throws BayesianException {
+  public void infer(Classifier classifier, Analyser<${classificationClassName}> analyser, BuildAnalyser<${classificationClassName}> buildAnalyser) throws BayesianException {
 <#list derivationOrder as observable>
     <#assign derivation = observable.derivation>
   <#if derivation.postAnalysis>
@@ -165,7 +166,7 @@ public class ${className} implements Builder<${classificationClassName}> {
   }
 
   @Override
-  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<${classificationClassName}> analyser) throws BayesianException {
+  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<${classificationClassName}> analyser, BuildAnalyser<${classificationClassName}> buildAnalyser) throws BayesianException {
 <#list baseOrder as observable>
     <#assign derivation = observable.base>
     <#assign docVar = "classifier">
@@ -226,7 +227,7 @@ public class ${className} implements Builder<${classificationClassName}> {
   }
 
   @Override
-  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<${classificationClassName}> analyser) throws BayesianException {
+  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<${classificationClassName}> analyser, BuildAnalyser<${classificationClassName}> buildAnalyser) throws BayesianException {
     List<Function<Classifier, Boolean>> broadeners = new ArrayList<>();
 <#list network.broadeners as broadener>
     if (${broadener.broaden.buildClassifierCheck(compiler, "document", factoryClassName)}) {

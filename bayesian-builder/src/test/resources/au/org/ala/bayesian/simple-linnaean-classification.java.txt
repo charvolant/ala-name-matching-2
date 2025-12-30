@@ -34,28 +34,28 @@ public class SimpleLinnaeanClassification implements Classification<SimpleLinnae
   private Hints<SimpleLinnaeanClassification> hints;
 
   private SoundexGenerator soundex;
-  private static Function<SimpleLinnaeanClassification, SimpleLinnaeanClassification> REMOVE_CLASS =
-    c -> {
-      SimpleLinnaeanClassification nc;
-      if (c.class_ == null) return c;
-      nc = c.clone();
-      nc.class_ = null;
-      nc.addIssue(SimpleLinnaeanFactory.REMOVED_CLASS);
-      return nc;
-    };
   private static Function<SimpleLinnaeanClassification, SimpleLinnaeanClassification> REMOVE_ORDER =
     c -> {
       SimpleLinnaeanClassification nc;
-      if (c.order == null) return c;
+      if ((c.order == null)) return c;
       nc = c.clone();
       nc.order = null;
       nc.addIssue(SimpleLinnaeanFactory.REMOVED_ORDER);
       return nc;
     };
+  private static Function<SimpleLinnaeanClassification, SimpleLinnaeanClassification> REMOVE_CLASS =
+    c -> {
+      SimpleLinnaeanClassification nc;
+      if ((c.class_ == null)) return c;
+      nc = c.clone();
+      nc.class_ = null;
+      nc.addIssue(SimpleLinnaeanFactory.REMOVED_CLASS);
+      return nc;
+    };
   private static Function<SimpleLinnaeanClassification, SimpleLinnaeanClassification> REMOVE_PHYLUM =
     c -> {
       SimpleLinnaeanClassification nc;
-      if (!(c.class_ != null || c.order != null || c.family != null) || (c.phylum == null)) return c;
+      if (!(c.class_ != null || c.order != null || c.family != null) || ((c.phylum == null))) return c;
       nc = c.clone();
       nc.phylum = null;
       nc.addIssue(SimpleLinnaeanFactory.REMOVED_PHYLUM);
@@ -64,7 +64,7 @@ public class SimpleLinnaeanClassification implements Classification<SimpleLinnae
   private static Function<SimpleLinnaeanClassification, SimpleLinnaeanClassification> REMOVE_RANK =
     c -> {
       SimpleLinnaeanClassification nc;
-      if (c.taxonRank == null) return c;
+      if ((c.taxonRank == null)) return c;
       nc = c.clone();
       nc.taxonRank = null;
       nc.addIssue(SimpleLinnaeanFactory.REMOVED_RANK);
@@ -295,17 +295,17 @@ public class SimpleLinnaeanClassification implements Classification<SimpleLinnae
     List<Function<SimpleLinnaeanClassification, SimpleLinnaeanClassification>> ml;
     ml = new ArrayList();
     ml.add(null);
-    if (this.order != null)
+    if ((this.order != null))
       ml.add(REMOVE_ORDER);
-    if (this.class_ != null)
+    if ((this.class_ != null))
       ml.add(REMOVE_CLASS);
-    if ((this.class_ != null || this.order != null || this.family != null) && (this.phylum != null))
+    if ((this.class_ != null || this.order != null || this.family != null) && ((this.phylum != null)))
       ml.add(REMOVE_PHYLUM);
     if (ml.size() > 1)
       modifications.add(ml);
     ml = new ArrayList();
     ml.add(null);
-    if (this.taxonRank != null)
+    if ((this.taxonRank != null))
       ml.add(REMOVE_RANK);
     if (ml.size() > 1)
       modifications.add(ml);

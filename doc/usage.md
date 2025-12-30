@@ -12,8 +12,8 @@ You will need to install the libraries and indexes before using them.
 
 You can access pre-built search indexes at https://ala-nameindexes.s3.amazonaws.com/
 
-The current indexes are in `20230725-5`: 
-`linnanen-20230725-5.zip`, `vernacular-20230725-5.zip` and `location-20230725-5.zip`
+The current indexes are in `2025-1-3`: 
+`linnanen-2025-1-3.zip`, `vernacular-2025-1-3.zip` and `location-22025-1-3.zip`
 Generally, these are expected to be unzipped into the `/data/lucene` directory.
 
 #### Suggester Index
@@ -21,8 +21,8 @@ Generally, these are expected to be unzipped into the `/data/lucene` directory.
 The suggester index is used to provide auto-suggest options.
 If not present, the suggester index is built from search indexes
 on-demand, a process that can take 20 minutes or more.
-If the file `/data/tmp/suggester-20230725-5/suggester-metadata.json` exists and shows a later date than the source data,
-then the already built index in `/data/tmp/suggester-20230725-5` is used.
+If the file `/data/tmp/suggester-2025-1-3/suggester-metadata.json` exists and shows a later date than the source data,
+then the already built index in `/data/tmp/suggester-2025-1-3` is used.
 
 ### Building
 
@@ -64,9 +64,9 @@ import au.org.ala.bayesian.ClassificationMatcherConfiguration;
 import au.org.ala.names.ALANameSearcher;
 import au.org.ala.names.lucene.LuceneClassifierSearcherConfiguration;
 
-File index = new File("/data/lucene/index-20230725-5");
-File vernacular = new File("/data/lucene/vernacular-20230725-5");
-File suggester = new File("/data/tmp/suggester-20230725-5");
+File index = new File("/data/lucene/linnaean-2025-1-3");
+File vernacular = new File("/data/lucene/vernacular-2025-1-3");
+File suggester = new File("/data/tmp/suggester-2025-1-3");
 LuceneClassifierSearcherConfiguration sConfig = LuceneClassifierSearcherConfiguration.builder()
         .queryLimit(10)
         .cacheSize(20000)

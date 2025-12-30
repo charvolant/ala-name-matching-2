@@ -142,18 +142,18 @@ public class ALANameSearcherConfigurationTest {
     @Test
     public void testGetLocation2() throws Exception {
         ALANameSearcherConfiguration configuration = ALANameSearcherConfiguration.builder()
-                .version("20230725-5")
+                .version("2025-1-3")
                 .build();
-        assertEquals(new File("/data/namematching/location-20230725-5"), configuration.getLocation());
+        assertEquals(new File("/data/namematching/location-2025-1-3"), configuration.getLocation());
     }
 
     @Test
     public void testGetLocation3() throws Exception {
         ALANameSearcherConfiguration configuration = ALANameSearcherConfiguration.builder()
                 .index(new File("/data/tmp"))
-                .version("20230725-5")
+                .version("2025-1-3")
                 .build();
-        assertEquals(new File("/data/tmp/location-20230725-5"), configuration.getLocation());
+        assertEquals(new File("/data/tmp/location-2025-1-3"), configuration.getLocation());
     }
 
     @Test

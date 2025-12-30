@@ -39,6 +39,7 @@ public class AlaVernacularBuilderTest extends TestUtils {
         config.setNetwork(AlaVernacularBuilder.class.getResource("/ala-vernacular.json"));
         config.setWork(work);
         config.setFactoryClass(AlaVernacularFactory.class);
+        config.setBuildAnalyserClass(AlaVernacularBuildAnalyser.class);
         builder = new IndexBuilder<AlaVernacularClassification, AlaVernacularInferencer, AlaVernacularFactory, LuceneClassifier>(config);
         Source source = Source.create(AlaVernacularBuilderTest.class.getResource("/sample-1.zip"), AlaVernacularFactory.instance(), AlaVernacularFactory.instance().getObservables(), config.getTypes());
         builder.load(source);

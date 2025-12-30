@@ -31,6 +31,7 @@ public class IndexBuilderTest {
         this.config = new IndexBuilderConfiguration();
         this.config.setWork(new File("target/test-work"));
         this.config.setBuilderClass(SimpleLinnaeanBuilder.class);
+        this.config.setBuildAnalyserClass(NullBuildAnalyser.class);
         this.config.setLoadStoreClass(LuceneLoadStore.class);
         this.config.setNetwork(this.getClass().getResource("../lucene/simple-network.json"));
         this.config.setFactoryClass(SimpleLinnaeanFactory.class);

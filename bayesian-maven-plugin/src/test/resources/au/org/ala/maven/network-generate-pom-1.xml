@@ -30,6 +30,7 @@
                      <outputDirectory>target/test-harness/network-generator-unit-test</outputDirectory>
                      <matcherClass>au.org.ala.maven.testClassificationMatcher</matcherClass>
                      <analyserClass>au.org.ala.maven.TestAnalyser</analyserClass>
+                     <buildAnalyserClass>au.org.ala.maven.TestBuildAnalyser</buildAnalyserClass>
                  </configuration>
                 <goals>
                     <goal>generate-network</goal>

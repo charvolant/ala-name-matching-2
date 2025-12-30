@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A modifier that is the composition of other modifiers.
@@ -17,6 +18,9 @@ public class CompositeModifier extends BaseModifier {
     @JsonProperty
     @Getter
     private List<Modifier> modifiers;
+    @JsonProperty
+    @Getter
+    private boolean anyModifier = false;
 
     /**
      * Default constructor.
@@ -34,10 +38,12 @@ public class CompositeModifier extends BaseModifier {
      * @param id The modifier identifier
      * @param modifiers The list of modifiers
      * @param clearDerived Clear derived values
+     * @param anyModifier Any triggerable modifier will trigger this composite modifier
      */
-    public CompositeModifier(String id, List<Modifier> modifiers, boolean clearDerived) {
+    public CompositeModifier(String id, List<Modifier> modifiers, boolean clearDerived, boolean anyModifier) {
         super(id, clearDerived);
         this.modifiers = modifiers;
+        this.anyModifier = anyModifier;
     }
 
     /**
@@ -51,6 +57,16 @@ public class CompositeModifier extends BaseModifier {
     }
 
     /**
+     * Do we allow any condition to be true
+     *
+     * @return Any condition will allow things to go ahead
+     */
+    @Override
+    public boolean getAnyCondition() {
+        return true;
+    }
+
+    /**
      * The set of observables that need to be present for this modification to succeed.
      *
      * @return The union of all conditions
@@ -59,17 +75,18 @@ public class CompositeModifier extends BaseModifier {
      */
     @Override
     public Set<Observable> getConditions() {
-        return this.modifiers.stream().map(Modifier::getConditions).flatMap(Collection::stream).collect(Collectors.toSet());
+        return Collections.emptySet();
     }
 
     /**
-     * Can we proceed with any conditonal variable being true or must we have all of them?
+     * Get all the modifiers that
      *
-     * @return False, we need all sub-conditions to be met.
+     * @return The fulle set of modifiers
      */
     @Override
-    public boolean getAnyCondition() {
-        return false;
+    public List<Modifier> getAllModifiers() {
+        Stream<Modifier> subs = this.modifiers.stream().flatMap(m -> m.getAllModifiers().stream());
+        return Stream.concat(subs, super.getAllModifiers().stream()).collect(Collectors.toList());
     }
 
     /**
@@ -86,24 +103,30 @@ public class CompositeModifier extends BaseModifier {
      */
     @Override
     public void generateModification(NetworkCompiler compiler, String from, String to, List<String> statements) throws BayesianException {
-        for (Modifier m: this.modifiers) {
-            m.generateModification(compiler, from, to, statements);
-        }
+        for (Modifier m: this.modifiers)
+            statements.add(to + " = " + m.getJavaConstant() + ".apply(" + to + ");");
     }
 
     /**
-     * Generate a list of tests to see whether we should run this modifier.
-     * <p>
-     * One or more of these checks being true means that the modifier will <em>not</em> be used.
-     * </p>
+     * Generate the full test for this modifier.
      *
      * @param compiler The compiled network
-     * @param var      The variable to check
-     * @param positive True if we want to use the modifier
+     * @param var The variable to check
+     * @param positive True if this is a check to see if we should use the modifier
      * @return The list of checks to perform
+     *
+     * @see #buildChecks(NetworkCompiler, String, boolean)
      */
     @Override
-    public List<String> buildChecks(NetworkCompiler compiler, String var, boolean positive) {
-        return this.modifiers.stream().map(m -> m.buildCheck(compiler, var, positive)).filter(Objects::nonNull).map(c -> "(" + c + ")").collect(Collectors.toList());
+    public String buildCheck(NetworkCompiler compiler, String var, boolean positive) {
+        String base = super.buildCheck(compiler, var, positive);
+        Set<String> subChecks = this.modifiers.stream().map(m -> m.buildCheck(compiler, var, positive)).filter(Objects::nonNull).collect(Collectors.toSet());
+        if (subChecks == null || subChecks.isEmpty())
+            return base;
+        final String connector = (positive && this.anyModifier) || (!positive && !this.anyModifier) ? ") || (" : ") && (";
+        String check = "(" + subChecks.stream().collect(Collectors.joining(connector)) + ")";
+        if (base != null && !base.isEmpty())
+            check = "(" + base + ")" + (positive ? " && " : " || ") + "(" + check + ")";
+        return check;
     }
 }

@@ -14,61 +14,70 @@ public class AnalyserConfigTest {
     public void testRelative1() throws Exception {
         AnalyserConfig config = AnalyserConfig.builder().build();
         AnalyserConfig relative = config.relative(BASE);
-        assertNull(relative.getSpecialCases());
+        assertNull(relative.getParameter("foo", null));
     }
 
     @Test
     public void testRelative2() throws Exception {
         URL special = new URL("https://somewhere.com/x.txt");
-        AnalyserConfig config = AnalyserConfig.builder().specialCases(special).build();
+        AnalyserConfig config = AnalyserConfig.builder().build().with("foo", special);
         AnalyserConfig relative = config.relative(BASE);
-        assertNotNull(relative.getSpecialCases());
-        assertEquals(special.toString(), relative.getSpecialCases().toString());
+        URL rebased = relative.getURL("foo", null);
+        assertNotNull(rebased);
+        assertEquals(special.toString(), rebased.toString());
     }
 
     @Test
     public void testRelative3() throws Exception {
         URL special = new URL("file:///notdata/test/x.txt");
-        AnalyserConfig config = AnalyserConfig.builder().specialCases(special).build();
+        AnalyserConfig config = AnalyserConfig.builder().build().with("foo", special);
         AnalyserConfig relative = config.relative(BASE);
-        assertNotNull(relative.getSpecialCases());
-        assertEquals(special.toString(), relative.getSpecialCases().toString());
+        URL rebased = relative.getURL("foo", null);
+        assertNotNull(rebased);
+        assertEquals(special.toString(), rebased.toString());
     }
 
     @Test
     public void testRelative4() throws Exception {
         URL special = new URL("file:///data/test/x.txt");
-        AnalyserConfig config = AnalyserConfig.builder().specialCases(special).build();
+        AnalyserConfig config = AnalyserConfig.builder().build().with("foo", special);
         AnalyserConfig relative = config.relative(BASE);
-        assertNotNull(relative.getSpecialCases());
-        assertEquals("file:x.txt", relative.getSpecialCases().toString());
+        URL rebased = relative.getURL("foo", null);
+        assertNotNull(rebased);
+        assertEquals("file:x.txt", rebased.toString());
     }
 
     public void testAbsolute1() throws Exception {
         AnalyserConfig config = AnalyserConfig.builder().build();
         AnalyserConfig relative = config.absolute(BASE);
-        assertNull(relative.getSpecialCases());
+        assertNull(relative.getParameter("foo", null));
     }
 
     public void testAbsolute2() throws Exception {
         URL special = new URL("https://somewhere.com/x.txt");
-        AnalyserConfig config = AnalyserConfig.builder().specialCases(special).build();
-        AnalyserConfig relative = config.absolute(BASE);
-        assertEquals(special, relative.getSpecialCases());
+        AnalyserConfig config = AnalyserConfig.builder().build().with("foo", special);
+        AnalyserConfig absolute = config.absolute(BASE);
+        URL rebased = absolute.getURL("foo", null);
+        assertNotNull(rebased);
+        assertEquals(special.toString(), rebased.toString());
     }
 
     public void testAbsolute3() throws Exception {
         URL special = new URL("file:///somewhere/x.txt");
-        AnalyserConfig config = AnalyserConfig.builder().specialCases(special).build();
-        AnalyserConfig relative = config.absolute(BASE);
-        assertEquals(special, relative.getSpecialCases());
+        AnalyserConfig config = AnalyserConfig.builder().build().with("foo", special);
+        AnalyserConfig absolute = config.absolute(BASE);
+        URL rebased = absolute.getURL("foo", null);
+        assertNotNull(rebased);
+        assertEquals(special.toString(), rebased.toString());
     }
 
     public void testAbsolute4() throws Exception {
         URL special = new URL("file:x.txt");
-        AnalyserConfig config = AnalyserConfig.builder().specialCases(special).build();
-        AnalyserConfig relative = config.absolute(BASE);
-        assertEquals("file:///data/test/x.txt", relative.getSpecialCases().toString());
+        AnalyserConfig config = AnalyserConfig.builder().build().with("foo", special);
+        AnalyserConfig absolute = config.absolute(BASE);
+        URL rebased = absolute.getURL("foo", null);
+        assertNotNull(rebased);
+        assertEquals("file:///data/test/x.txt", rebased.toString());
     }
 
 }

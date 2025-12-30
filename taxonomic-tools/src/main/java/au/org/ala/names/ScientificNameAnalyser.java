@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
@@ -31,15 +32,21 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Common analysis for scientific names
+ * Common analysis for scientific names.
+ * <p>
+ * Special cases can be handled by loading a CSV file of oddities.
+ * Use the parameter {@link #SPECIAL_CASE_KEY} to specify the location of the special cases.
+ * </p>
  *
  * @param <C> The classification
  */
-abstract public class ScientificNameAnalyser<C extends Classification<C>> implements Analyser<C>, Cloneable {
+public class ScientificNameAnalyser<C extends Classification<C>> implements Cloneable {
     private static final Logger logger = LoggerFactory.getLogger(ScientificNameAnalyser.class);
 
     protected static final ThreadLocal<NameParser> PARSER = ThreadLocal.withInitial(NameParserGBIF::new);
 
+    /** The special cases key */
+    public static final String SPECIAL_CASE_KEY = "analyser.special";
 
     /** The standard name to write this special case parser to */
     public static final String SPECIAL_CASE_NAMES = "special-case-names.csv";
@@ -225,11 +232,12 @@ abstract public class ScientificNameAnalyser<C extends Classification<C>> implem
      * @param config The analyser configuration
      */
     public ScientificNameAnalyser(AnalyserConfig config) {
-        if (config != null && config.getSpecialCases() != null) {
+        URL special = config == null ? null : config.getURL(SPECIAL_CASE_KEY, null);
+        if (special != null) {
             try {
-                this.special = SpecialCaseNameParser.fromCSV(config.getSpecialCases());
+                this.special = SpecialCaseNameParser.fromCSV(special);
             } catch (Exception ex) {
-                logger.error("Unable to read special cases from " + config.getSpecialCases(), ex);
+                logger.error("Unable to read special cases from " + special, ex);
             }
         }
     }
@@ -893,21 +901,6 @@ abstract public class ScientificNameAnalyser<C extends Classification<C>> implem
     }
 
     /**
-     * Decide whether to accept a synonym or not.
-     * <p>
-     * By default, accept a synonym.
-     * </p>
-     *
-     * @param base The classification the synonym is for
-     * @param candidate      The classifier for the synonym
-     * @return True if this is an acceptable synonym.
-     */
-    @Override
-    public boolean acceptSynonym(Classifier base, Classifier candidate) {
-        return true;
-    }
-
-    /**
      * Check for an invalid value in a name.
      *
      * @param name The name
@@ -928,37 +921,6 @@ abstract public class ScientificNameAnalyser<C extends Classification<C>> implem
             }
         }
         return name;
-    }
-
-    /**
-     * Store the analuster configuration, including special cases if required
-     *
-     * @param directory The directory to write to
-     *
-     * @return The path to the analyser configuration
-     *
-     * @throws IOException if unable to write the configuration
-     */
-    @Override
-    public File writeConfiguration(File directory) throws IOException {
-        File specialFile = null;
-        if (this.special != null) {
-            specialFile = new File(directory, SPECIAL_CASE_NAMES);
-            if (specialFile.exists())
-                throw new FileAlreadyExistsException("Special case file " + specialFile + " already exists");
-            FileWriter writer = new FileWriter(specialFile, Charset.forName("UTF-8"));
-            this.special.store(writer);
-        }
-        AnalyserConfig config = AnalyserConfig.builder()
-                .specialCases(specialFile == null ? null : specialFile.toURI().toURL())
-                .build();
-        File configFile = new File(directory, AnalyserConfig.DEFAULT_CONFIG_FILE_NAME);
-        if (configFile.exists())
-            throw new FileAlreadyExistsException("Configuration " + configFile + " already exists");
-        FileWriter writer = new FileWriter(configFile);
-        config.relative(directory).store(writer);
-        writer.close();
-        return configFile;
     }
 
     protected static class Analysis implements Cloneable {

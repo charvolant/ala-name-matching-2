@@ -33,11 +33,6 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>au.org.ala.names</groupId>
-            <artifactId>bayesian-lucene</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>${opencsv.version}</version>
@@ -73,6 +68,7 @@
                             <generateClassification>true</generateClassification>
                             <generateFactory>true</generateFactory>
                             <analyserClass>au.org.ala.names.AlaNameAnalyser</analyserClass>
+                            <buildAnalyserClass>au.org.ala.names.AlaNameBuildAnalyser</buildAnalyserClass>
                         </configuration>
                     </execution>
                     <execution>
@@ -101,6 +97,7 @@
                             <generateClassification>true</generateClassification>
                             <generateFactory>true</generateFactory>
                             <analyserClass>au.org.ala.names.AlaVernacularAnalyser</analyserClass>
+                            <buildAnalyserClass>au.org.ala.names.AlaVernacularBuildAnalyser</buildAnalyserClass>
                         </configuration>
                     </execution>
                     <execution>
@@ -129,6 +126,7 @@
                             <generateClassification>true</generateClassification>
                             <generateFactory>true</generateFactory>
                             <analyserClass>au.org.ala.location.AlaLocationAnalyser</analyserClass>
+                            <buildAnalyserClass>au.org.ala.location.AlaLocationBuildAnalyser</buildAnalyserClass>
                         </configuration>
                     </execution>
                     <execution>

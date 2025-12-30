@@ -59,12 +59,12 @@ abstract public class AbstractCli<C extends Classification<C>, B extends Builder
     @Parameter(names = { "-m", "--metadata"}, splitter=NoSplitter.class, description = "Additional metadata settings for the final index in term=value form")
     @Getter
     private List<String> metadata = new ArrayList<>();
-    @Parameter(names = { "-p", "--parameter"}, splitter=NoSplitter.class, description = "Additional parameter settings for objects such as the weight analyser in term=value form. See individual classes for more information.")
+    @Parameter(names = { "-p", "--parameter"}, splitter=NoSplitter.class, description = "Additional parameter settings for objects such as the weight analyser or name analyser in term=value form. See individual classes for more information.")
     @Getter
     private List<String> parameters = new ArrayList<>();
-    @Parameter(names = { "--special"}, description = "The URL of an analyser-specific special cases file", converter = URLConverter.class)
+    @Parameter(names = { "-u", "--url"}, splitter=NoSplitter.class, description = "Additional parameter settings for objects such as the weight analyser or name analyser in term=value form. These are URLs and can be relativised, if needed. See individual classes for more information.")
     @Getter
-    private URL specialCases;
+    private List<String> urls = new ArrayList<>();
      /** The input sources */
     @Parameter(description = "The source DwCAs", listConverter = URLConverter.class, required = true)
     @Getter
@@ -110,10 +110,17 @@ abstract public class AbstractCli<C extends Classification<C>, B extends Builder
                 throw new IllegalStateException("Can't parse parameter value " + p);
             configuration.addParameter(pkv[0], pkv[1]);
         }
-        if (this.specialCases != null) {
-            AnalyserConfig analyserConfig = AnalyserConfig.builder().specialCases(this.specialCases).build();
-            configuration.setAnalyserConfig(analyserConfig);
+        for (String u: this.urls) {
+            String[] ukv = u.split("=", 2);
+            if (ukv.length < 2)
+                throw new IllegalStateException("Can't parse  URL parameter value " + u);
+            configuration.addURL(ukv[0], new URL(ukv[1]));
         }
+        AnalyserConfig analyserConfig = AnalyserConfig.builder()
+                .parameters(configuration.getParameters())
+                .urls(configuration.getUrls())
+                .build();
+        configuration.setAnalyserConfig(analyserConfig);
         return configuration;
     }
 

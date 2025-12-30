@@ -14,12 +14,17 @@ import org.gbif.nameparser.util.NameFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class AlaNameAnalyser extends ScientificNameAnalyser<AlaLinnaeanClassification> {
+public class AlaNameAnalyser extends ScientificNameAnalyser<AlaLinnaeanClassification> implements Analyser<AlaLinnaeanClassification> {
     private final Logger logger = LoggerFactory.getLogger(AlaNameAnalyser.class);
 
     /** Invalid authorship */
@@ -71,7 +76,7 @@ public class AlaNameAnalyser extends ScientificNameAnalyser<AlaLinnaeanClassific
 
 
     /**
-     * This is a really, really annoyting thiung where we split apart names of
+     * This is a really, really annoying thing where we split apart names of
      * the form <em>fam. Gracilariaceae gen. Gracilaria</em> I mean,
      * come on people!
      *
@@ -295,67 +300,6 @@ public class AlaNameAnalyser extends ScientificNameAnalyser<AlaLinnaeanClassific
 
     /**
      * Analyse the information in a classifier and extend the classifier
-     * as required for indexing.
-     *
-     * @param classifier The classifier
-     */
-    @Override
-    public void analyseForIndex(Classifier classifier) throws InferenceException, StoreException {
-        String id = classifier.get(AlaLinnaeanFactory.taxonId);
-        String scientificName = classifier.get(AlaLinnaeanFactory.scientificName);
-        String scientificNameAuthorshup = classifier.get(AlaLinnaeanFactory.scientificNameAuthorship);
-        Analysis analysis = new Analysis(
-                classifier.get(AlaLinnaeanFactory.scientificName),
-                classifier.get(AlaLinnaeanFactory.scientificNameAuthorship),
-                classifier.get(AlaLinnaeanFactory.taxonRank),
-                classifier.get(AlaLinnaeanFactory.nomenclaturalCode),
-                MatchOptions.ALL
-        );
-        String suppliedKingdom = classifier.get(AlaLinnaeanFactory.kingdom);
-        analysis.setKingdom(suppliedKingdom);
-        if (!this.checkKingdom(analysis, KINGDOM_ISSUES, null)) {
-            logger.warn("Unrecognised kingdom " + suppliedKingdom + " on " + id);
-        }
-        if (this.replaceUnprintable(analysis, 'x', DATA_ISSUES, null))
-            throw new InferenceException("Replacement character in name while indexing for " + id + ": " + StringEscapeUtils.escapeJava(scientificName == null ? "" : scientificName) + " " + StringEscapeUtils.escapeJava(scientificNameAuthorshup == null ? "" : scientificNameAuthorshup));
-        this.processIndeterminate(analysis, null, INDETERMINATE_ISSUES, null);
-        this.processAffinitySpecies(analysis, " aff. ", AFFINTIY_ISSUES, null);
-        this.processConferSpecies(analysis, " cf. ", CONFER_ISSUES, null);
-        this.processSpeciesNovum(analysis, true, null, null);
-        this.processPhraseName(analysis, null);
-        this.processEmbeddedAuthor(analysis, CANONICAL_MODIFICATION, null);
-        this.parseName(analysis, UNPARSABLE_ISSUES);
-        this.processParsedScientificName(analysis, CANONICAL_MODIFICATION, null);
-        this.processTrinomial(analysis, CANONICAL_MODIFICATION);
-        this.fillOutClassifier(analysis, classifier);
-        this.detectNumericPlaceholder(analysis, classifier);
-        classifier.add(AlaLinnaeanFactory.scientificName, analysis.getScientificName(), false, true);
-        classifier.add(AlaLinnaeanFactory.scientificNameAuthorship, analysis.getScientificNameAuthorship(), false, true);
-        classifier.add(AlaLinnaeanFactory.taxonRank, analysis.isUnranked() ? null : analysis.getRank(), false, true);
-        classifier.add(AlaLinnaeanFactory.nameType, analysis.getNameType(), false, true);
-        classifier.add(AlaLinnaeanFactory.kingdom, analysis.getKingdom(), false, true);
-        if (classifier.has(AlaLinnaeanFactory.cultivarEpithet) && classifier.has(AlaLinnaeanFactory.specificEpithet)) {
-            // Check case where cultivar epithet is on specific epithet
-            String cultivarEpithet = classifier.get(AlaLinnaeanFactory.cultivarEpithet);
-            String specificEpithet = classifier.get(AlaLinnaeanFactory.specificEpithet);
-            Matcher matcher = SUSPECTED_CULTIVAR_IN_SPECIFIC_EPITHET.matcher(specificEpithet);
-            if (matcher.find() && matcher.group(1).equals(cultivarEpithet)) {
-                classifier.add(AlaLinnaeanFactory.specificEpithet, specificEpithet.substring(0, matcher.start()).trim(), false, true);
-                analysis.addIssues(CANONICAL_MODIFICATION);
-            }
-        }
-
-        // Remove loops in taxonomy
-        if (classifier.has(AlaLinnaeanFactory.parentNameUsageId) && classifier.get(AlaLinnaeanFactory.parentNameUsageId).equals(id)) {
-            classifier.clear(AlaLinnaeanFactory.parentNameUsageId);
-        }
-        if (classifier.has(AlaLinnaeanFactory.acceptedNameUsageId) && classifier.get(AlaLinnaeanFactory.acceptedNameUsageId).equals(id)) {
-            classifier.clear(AlaLinnaeanFactory.acceptedNameUsageId);
-        }
-    }
-
-    /**
-     * Analyse the information in a classifier and extend the classifier
      * as required for searching.
      *
      * @param classification The classification
@@ -426,98 +370,36 @@ public class AlaNameAnalyser extends ScientificNameAnalyser<AlaLinnaeanClassific
         }
     }
 
-    /**
-     * Build a collection of base names for the classification.
-     * <p>
-     * If a classification can be referred to in multiple ways, this method
-     * builds the various ways of referring to the classification.
-     * </p>
-     *
-     * @param classifier The classification
-     * @param name       The observable that gives the name
-     * @param complete   The observable that gives the complete name
-     * @param disambiguator The observable that gives additional disambiguation, geneerally complete = name + ' ' + disambiguator
-     * @param canonical  Only include canonical names
-     * @return All the names that refer to the classification
-     */
-    @Override
-    public Set<String> analyseNames(Classifier classifier, Observable<String> name, Optional<Observable<String>> complete, Optional<Observable<String>> disambiguator, boolean canonical) throws InferenceException {
-        Rank rank = classifier.get(AlaLinnaeanFactory.taxonRank);
-        NomenclaturalCode code = classifier.get(AlaLinnaeanFactory.nomenclaturalCode);
-        String scientificName = classifier.get(name);
-        String scientificNameAuthorship = classifier.get(AlaLinnaeanFactory.scientificNameAuthorship);
-
-        Analysis analysis = new Analysis(scientificName, scientificNameAuthorship, rank, code, MatchOptions.ALL);
-
-        Set<String> allDisambiguators = !canonical && disambiguator.isPresent() ? classifier.getAll(disambiguator.get()) : Collections.emptySet();
-        Set<String> allCompleteNames = !canonical && complete.isPresent() ? classifier.getAll(complete.get()) : Collections.emptySet();
-        Set<String> allScientificNames = this.generateBaseNames(analysis, classifier, name);
-
-        if (allScientificNames.isEmpty())
-            throw new InferenceException("No scientific name for " + classifier.get(AlaLinnaeanFactory.taxonId));
-        for (String nm : allScientificNames) {
-            analysis.addName(nm);
-            analysis.addName(BASIC_NORMALISER.normalise(nm));
-            analysis.addName(PUNCTUATION_NORMALISER.normalise(nm));
-            nm = FULL_NORMALISER.normalise(nm);
-            analysis.addName(nm);
-
-            // From now on, only use the normalised version
-            Analysis sub = analysis.with(nm);
-
-            this.processIndeterminate(sub, " ", null, null);
-            this.processAffinitySpecies(sub, " aff. ", null, null);
-            this.processConferSpecies(sub, " cf. ", null, null);
-            this.processSpeciesNovum(sub, true, null, null);
-            this.processPhraseName(sub, null);
-            this.processEmbeddedAuthor(analysis, null, null);
-            this.parseName(sub, null);
-            if (sub.getParsedName() != null) {
-                this.processParsedScientificName(sub, null, null);
-                this.processAdditionalScientificNames(sub);
-                if (this.processRankMarker(sub, true, null, null)) {
-                    this.parseName(sub, null);
-                    this.processParsedScientificName(sub, null, null);
-                    this.processAdditionalScientificNames(sub);
-                }
-            }
-        }
-
-        // Add name/author pairs
-        if (allCompleteNames.isEmpty() && !allDisambiguators.isEmpty()) {
-            allCompleteNames = allScientificNames.stream().flatMap(n -> allDisambiguators.stream().map(a -> n + " " + a)).collect(Collectors.toSet());
-        }
-        for (String nm : allCompleteNames) {
-            analysis.addName(BASIC_NORMALISER.normalise(nm));
-            analysis.addName(PUNCTUATION_NORMALISER.normalise(nm));
-            analysis.addName(FULL_NORMALISER.normalise(nm));
-        }
-        return analysis.getNames();
-    }
 
     /**
-     * Decide whether to accept a synonym or not.
-     * <p>
-     * Only accept synonyms where the classifier is within two linnaean ranks distance of the classification.
-     * The Species and sub-species range always pass because they are too fluid for accurate distance measurements.
-     * </p>
+     * Store the analyser configuration, including special cases if required
      *
-     * @param base The classifier the synonym is for
-     * @param candidate      The classifier for the synonym
-     * @return True if this is an acceptable synonym.
+     * @param directory The directory to write to
+     *
+     * @return The path to the analyser configuration
+     *
+     * @throws IOException if unable to write the configuration
      */
     @Override
-    public boolean acceptSynonym(Classifier base, Classifier candidate) {
-        Rank baseRank = base.has(AlaLinnaeanFactory.taxonRank) ? base.get(AlaLinnaeanFactory.taxonRank) : Rank.UNRANKED;
-        if (baseRank.otherOrUnranked())
-            return true;
-        Rank candidateRank = candidate.has(AlaLinnaeanFactory.taxonRank) ? candidate.get(AlaLinnaeanFactory.taxonRank) : Rank.UNRANKED;
-        if (candidateRank.otherOrUnranked())
-            return true;
-        if (baseRank.isSpeciesOrBelow() && candidateRank.isSpeciesOrBelow())
-            return true;
-        int classificationRankID = RankIDAnalysis.idFromRank(baseRank);
-        int candidateRankID = RankIDAnalysis.idFromRank(candidateRank);
-        return Math.abs(classificationRankID - candidateRankID) < SYNONYM_RANK_DISTANCE;
+    public File writeConfiguration(File directory) throws IOException {
+        File specialFile = null;
+        if (this.special != null) {
+            specialFile = new File(directory, SPECIAL_CASE_NAMES);
+            if (specialFile.exists())
+                throw new FileAlreadyExistsException("Special case file " + specialFile + " already exists");
+            FileWriter writer = new FileWriter(specialFile, Charset.forName("UTF-8"));
+            this.special.store(writer);
+        }
+        AnalyserConfig config = AnalyserConfig.builder()
+                .build()
+                .with(SPECIAL_CASE_KEY, specialFile == null ? null : specialFile.toURI().toURL());
+        File configFile = new File(directory, AnalyserConfig.DEFAULT_CONFIG_FILE_NAME);
+        if (configFile.exists())
+            throw new FileAlreadyExistsException("Configuration " + configFile + " already exists");
+        FileWriter writer = new FileWriter(configFile);
+        config.relative(directory).store(writer);
+        writer.close();
+        return configFile;
     }
+
 }

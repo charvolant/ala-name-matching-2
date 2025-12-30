@@ -54,6 +54,10 @@ public class IndexBuilderConfiguration {
     @Getter
     @Setter
     private Class<? extends Builder> builderClass;
+    @JsonProperty
+    @Getter
+    @Setter
+    private Class<? extends BuildAnalyser> buildAnalyserClass;
     /** The class of the load store */
     @JsonProperty
     @Getter
@@ -109,6 +113,10 @@ public class IndexBuilderConfiguration {
     @JsonProperty
     @Getter
     private Map<String, String> parameters;
+    /** Additional URL parameters for initialising various elements */
+    @JsonProperty
+    @Getter
+    private Map<String, URL> urls;
     /** Additional resource URLs for initialising various elements */
     @JsonProperty
     @Getter
@@ -127,6 +135,7 @@ public class IndexBuilderConfiguration {
         this.enableJmx = true;
         this.metadataTemplate = Metadata.builder().build();
         this.parameters = new HashMap<>();
+        this.urls = new HashMap<>();
         this.resources = new HashMap<>();
     }
 
@@ -152,6 +161,18 @@ public class IndexBuilderConfiguration {
      */
     public void addParameter(String term, String value) {
         this.parameters.put(term, value);
+    }
+
+    /**
+     * Add a URL to the template.
+     *
+     * @param term The field name
+     * @param value The value as a string
+     *
+     * @see Metadata#with(String, Object)
+     */
+    public void addURL(String term, URL value) {
+        this.urls.put(term, value);
     }
 
     /**
@@ -249,7 +270,7 @@ public class IndexBuilderConfiguration {
             return c.newInstance();
         } catch (Exception ex) {
         }
-        throw new StoreException("Unable to construct builder for " + this.builderClass);
+        throw new StoreException("Unable to construct factory for " + this.factoryClass);
     }
 
     /**
@@ -294,6 +315,46 @@ public class IndexBuilderConfiguration {
         } catch (Exception ex) {
         }
         throw new StoreException("Unable to construct builder for " + this.builderClass);
+    }
+
+    /**
+     * Construct a build analyser.
+     * <p>
+     * The build analyser must have either:
+     * A static instance() method for the factory,
+     * A constructor for an index builder configuration,
+     * or an empty constuctor.
+     * These are tried in turn.
+     * </p>
+     *
+     * @param annotator The annotator to use
+     *
+     * @return A newly created builder.
+     *
+     * @throws StoreException if unable to build the store
+     */
+    public <C extends Classification<C>> BuildAnalyser<C> createBuildAnalyser(Annotator annotator) throws StoreException {
+        Constructor<BuildAnalyser<C>> c;
+
+        if (this.buildAnalyserClass == null)
+            throw new StoreException("Build analyser class not defined");
+        try {
+            Method m = this.buildAnalyserClass.getMethod("instance");
+            if (m != null && Modifier.isStatic(m.getModifiers()))
+                return (BuildAnalyser<C>) m.invoke(null);
+        } catch (Exception ex) {
+        }
+        try {
+            c = (Constructor<BuildAnalyser<C>>) this.buildAnalyserClass.getConstructor(AnalyserConfig.class);
+            return c.newInstance(this.getAnalyserConfig());
+        } catch (Exception ex) {
+        }
+        try {
+            c = (Constructor<BuildAnalyser<C>>) this.buildAnalyserClass.getConstructor();
+            return c.newInstance();
+        } catch (Exception ex) {
+        }
+        throw new StoreException("Unable to construct build analyser for " + this.buildAnalyserClass);
     }
 
     /**

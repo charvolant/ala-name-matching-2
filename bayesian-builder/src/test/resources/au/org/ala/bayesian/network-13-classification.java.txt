@@ -35,7 +35,7 @@ public class Network13Classification implements Classification<Network13Classifi
   private static Function<Network13Classification, Network13Classification> MOD_1 =
     c -> {
       Network13Classification nc;
-      if (c.v1 == null && c.v3 == null) return c;
+      if ((c.v1 == null) && (c.v3 == null)) return c;
       nc = c.clone();
       nc.v2 = c.v3;
       if (nc.v2 == null)
@@ -46,10 +46,10 @@ public class Network13Classification implements Classification<Network13Classifi
   private static Function<Network13Classification, Network13Classification> MOD_2 =
     c -> {
       Network13Classification nc;
-      if (c.v3 == null) return c;
+      if ((c.v3 == null)) return c;
       nc = c.clone();
       nc.v3 = null;
-      nc.addIssue(Network13Factory.ISSUE_1);
+      nc.addIssue(Network13Factory.ISSUE_2);
       return nc;
     };
   private static Function<Network13Classification, Network13Classification> MOD_3 =
@@ -63,7 +63,7 @@ public class Network13Classification implements Classification<Network13Classifi
   private static Function<Network13Classification, Network13Classification> MOD_4 =
     c -> {
       Network13Classification nc;
-      if (c.v2 == null || c.v1 == null) return c;
+      if ((c.v1 == null) || (c.v2 == null)) return c;
       nc = c.clone();
       nc.v3 = c.v1 + " " + c.v2;
       nc.addIssue(Network13Factory.ISSUE_1);
@@ -72,15 +72,23 @@ public class Network13Classification implements Classification<Network13Classifi
   private static Function<Network13Classification, Network13Classification> MOD_5 =
     c -> {
       Network13Classification nc;
-      if ((c.v1 == null && c.v3 == null) || (c.v3 == null) || (c.v2 == null || c.v1 == null)) return c;
+      if (((c.v1 == null) && (c.v3 == null)) || ((c.v1 == null) || (c.v2 == null)) || ((c.v3 == null))) return c;
       nc = c.clone();
-      nc.v2 = c.v3;
-      if (nc.v2 == null)
-        nc.v2 = c.v1;
-      nc.v3 = null;
-      nc.v1 = au.org.ala.vocab.BayesianTerm.illformedData;
-      nc.v3 = c.v1 + " " + c.v2;
+      nc = MOD_1.apply(nc);
+      nc = MOD_2.apply(nc);
+      nc = MOD_3.apply(nc);
+      nc = MOD_4.apply(nc);
       nc.addIssue(Network13Factory.ISSUE_1);
+      return nc;
+    };
+  private static Function<Network13Classification, Network13Classification> MOD_6 =
+    c -> {
+      Network13Classification nc;
+      if ((!(c.v2 != null)) || (((c.v1 == null) && (c.v3 == null)) && ((c.v3 == null)))) return c;
+      nc = c.clone();
+      nc = MOD_1.apply(nc);
+      nc = MOD_2.apply(nc);
+      nc.addIssue(Network13Factory.ISSUE_2);
       return nc;
     };
 
@@ -222,15 +230,17 @@ public class Network13Classification implements Classification<Network13Classifi
     List<Function<Network13Classification, Network13Classification>> ml;
     ml = new ArrayList();
     ml.add(null);
-    if (this.v1 != null || this.v3 != null)
+    if ((this.v1 != null) || (this.v3 != null))
       ml.add(MOD_1);
-    if (this.v3 != null)
+    if ((this.v3 != null))
       ml.add(MOD_2);
     ml.add(MOD_3);
-    if (this.v2 != null && this.v1 != null)
+    if ((this.v2 != null) && (this.v1 != null))
       ml.add(MOD_4);
-    if ((this.v1 != null || this.v3 != null) && (this.v3 != null) && (this.v2 != null && this.v1 != null))
+    if (((this.v1 != null) || (this.v3 != null)) && ((this.v2 != null) && (this.v1 != null)) && ((this.v3 != null)))
       ml.add(MOD_5);
+    if (((this.v2 != null)) && (((this.v1 != null) || (this.v3 != null)) || ((this.v3 != null))))
+      ml.add(MOD_6);
     if (ml.size() > 1)
       modifications.add(ml);
     return modifications;

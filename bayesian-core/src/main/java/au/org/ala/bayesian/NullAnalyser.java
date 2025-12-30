@@ -23,23 +23,7 @@ public class NullAnalyser<C extends Classification<C>> implements Analyser<C> {
     }
 
     @Override
-    public void analyseForIndex(Classifier classifier) {
-    }
-
-    @Override
     public void analyseForSearch(C classification, MatchOptions options) {
-    }
-
-    @Override
-    public Set<String> analyseNames(Classifier classifier, Observable<String> name, Optional<Observable<String>> complete, Optional<Observable<String>> disambiguator, boolean canonical) {
-        if (classifier.has(name))
-            return Collections.singleton(classifier.get(name));
-        return Collections.emptySet();
-    }
-
-    @Override
-    public boolean acceptSynonym(Classifier base, Classifier candidate) {
-        return true;
     }
 
     @Override

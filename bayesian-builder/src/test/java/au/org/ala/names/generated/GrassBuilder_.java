@@ -5,6 +5,7 @@ import au.org.ala.bayesian.BayesianException;
 import au.org.ala.bayesian.Classifier;
 import au.org.ala.bayesian.ParameterAnalyser;
 import au.org.ala.bayesian.Parameters;
+import au.org.ala.names.builder.BuildAnalyser;
 import au.org.ala.names.builder.Builder;
 
 import java.util.Arrays;
@@ -26,27 +27,27 @@ public class GrassBuilder_ implements Builder<GrassClassification> {
   }
 
   @Override
-  public void generate(Classifier classifier, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void generate(Classifier classifier, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public void interpret(Classifier classifier, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void interpret(Classifier classifier, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public void infer(Classifier classifier, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void infer(Classifier classifier, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<GrassClassification> analyser) throws BayesianException {
+  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<GrassClassification> analyser) throws BayesianException {
+  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<GrassClassification> analyser, BuildAnalyser<GrassClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 

@@ -44,6 +44,7 @@ public class AlaLinnaeanBuilderTest extends TestUtils {
         config.setWork(work);
         config.setFactoryClass(AlaLinnaeanFactory.class);
         config.setWeightAnalyserClass(AlaWeightAnalyser.class);
+        config.setBuildAnalyserClass(AlaNameBuildAnalyser.class);
         builder = new IndexBuilder<AlaLinnaeanClassification, AlaLinnaeanInferencer, AlaLinnaeanFactory, LuceneClassifier>(config);
         Source source = Source.create(AlaLinnaeanBuilderTest.class.getResource("/sample-1.zip"), AlaLinnaeanFactory.instance(), AlaLinnaeanFactory.instance().getObservables(), config.getTypes());
         builder.load(source);

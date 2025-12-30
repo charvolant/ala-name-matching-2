@@ -217,6 +217,7 @@ public class JavaGeneratorTest {
         NetworkCompiler compiler = new NetworkCompiler(network, null);
         compiler.analyse();
         JavaGenerator generator = new JavaGenerator();
+        generator.getBuildAnalyserSpec().setImplementationClassName("au.org.ala.test.TestBuildAnalyser");
         generator.generateClass(compiler, generator.getCliSpec(), writer, null);
         // System.out.println(writer.toString());
         TestUtils.compareNoSpaces(TestUtils.getResource(this.getClass(), "network-9-cli.java.txt"), writer.toString());

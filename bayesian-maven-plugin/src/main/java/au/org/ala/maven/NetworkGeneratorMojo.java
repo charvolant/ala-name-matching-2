@@ -4,6 +4,7 @@ import au.org.ala.bayesian.JavaGenerator;
 import au.org.ala.bayesian.Network;
 import au.org.ala.bayesian.NetworkCompiler;
 import au.org.ala.names.builder.DefaultWeightAnalyser;
+import au.org.ala.names.builder.NullBuildAnalyser;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -45,6 +46,10 @@ public class NetworkGeneratorMojo extends AbstractMojo {
     /** Any analyser class to use. If null, a default parameterised analyser will be used */
     @Parameter(property="analyserClass")
     private String analyserClass;
+
+    /** Any build analyser class to use. If null, a default parameterised analyser will be used */
+    @Parameter(property="buildAnalyserClass")
+    private String buildAnalyserClass = NullBuildAnalyser.class.getName();
 
     /** Any weight analyser class to use. If null, a default parameterised analyser will be used */
     @Parameter(property="weightAnalyserClass")
@@ -185,6 +190,7 @@ public class NetworkGeneratorMojo extends AbstractMojo {
             generator.setArtifactName(this.project.getArtifactId());
             generator.getMatcherSpec().setImplementationClassName(this.matcherClass);
             generator.getAnalyserSpec().setImplementationClassName(this.analyserClass);
+            generator.getBuildAnalyserSpec().setImplementationClassName(this.buildAnalyserClass);
             generator.getWeightAnalyserSpec().setImplementationClassName(this.weightAnalyserClass);
             generator.generate(compiler);
         } catch (MojoExecutionException ex) {

@@ -467,16 +467,16 @@
   } ],
   "modifications" : [ {
     "@class" : "au.org.ala.bayesian.modifier.RemoveModifier",
-    "id" : "remove_class",
-    "issues" : [ "removed_class" ],
-    "clearDerived" : false,
-    "observables" : [ "class" ]
-  }, {
-    "@class" : "au.org.ala.bayesian.modifier.RemoveModifier",
     "id" : "remove_order",
     "issues" : [ "removed_order" ],
     "clearDerived" : false,
     "observables" : [ "order" ]
+  }, {
+    "@class" : "au.org.ala.bayesian.modifier.RemoveModifier",
+    "id" : "remove_class",
+    "issues" : [ "removed_class" ],
+    "clearDerived" : false,
+    "observables" : [ "class" ]
   }, {
     "@class" : "au.org.ala.bayesian.modifier.RemoveModifier",
     "id" : "remove_phylum",

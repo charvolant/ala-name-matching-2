@@ -1,6 +1,7 @@
 package au.org.ala.names;
 
 import au.org.ala.bayesian.*;
+import au.org.ala.location.AlaLocationBuildAnalyser;
 import au.org.ala.names.builder.IndexBuilder;
 import au.org.ala.names.builder.IndexBuilderConfiguration;
 import au.org.ala.names.builder.LoadStore;
@@ -50,6 +51,7 @@ public class AlaLinnaeanBuilderLargeTest extends TestUtils {
         config.setWork(work);
         config.setFactoryClass(AlaLinnaeanFactory.class);
         config.setWeightAnalyserClass(AlaWeightAnalyser.class);
+        config.setBuildAnalyserClass(AlaNameBuildAnalyser.class);
         builder = new IndexBuilder(config);
         Source source = Source.create(AlaLinnaeanBuilderLargeTest.class.getResource("/sample-2.zip"), AlaLinnaeanFactory.instance(), AlaLinnaeanFactory.instance().getObservables(), config.getTypes());
         builder.load(source);

@@ -15,7 +15,7 @@ import java.io.File;
 import static org.junit.Assert.*;
 
 public class ALALocationMatcherTest {
-    public static final String INDEX = "/data/lucene/location-20230725-5";
+    public static final String INDEX = "/data/lucene/location-2025-1-3";
 
     private LuceneClassifierSearcher searcher;
     private ALALocationClassificationMatcher matcher;

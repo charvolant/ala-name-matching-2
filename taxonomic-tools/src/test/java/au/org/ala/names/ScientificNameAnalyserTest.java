@@ -28,29 +28,8 @@ public class ScientificNameAnalyserTest {
     @Before
     public void setUp() throws Exception {
         URL specialCases = this.getClass().getResource("special-case-1.csv");
-        AnalyserConfig config = AnalyserConfig.builder().specialCases(specialCases).build();
-        this.analyser = new ScientificNameAnalyser<TestClassification>(config) {
-            @Override
-            public void analyseForIndex(Classifier classifier) throws InferenceException {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void analyseForSearch(TestClassification classification, MatchOptions options) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public Set<String> analyseNames(Classifier classifier, Observable<String> name, Optional<Observable<String>> complete, Optional<Observable<String>> disambiguator, boolean canonical) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public boolean acceptSynonym(Classifier base, Classifier candidate) {
-                return true;
-            }
-
-        };
+        AnalyserConfig config = AnalyserConfig.builder().build().with(ScientificNameAnalyser.SPECIAL_CASE_KEY, specialCases);
+        this.analyser = new ScientificNameAnalyser<TestClassification>(config);
     }
 
     Analysis makeAnalysis(String scientificName, String scientificNameAuthorship, Rank rank, NomenclaturalCode code) {

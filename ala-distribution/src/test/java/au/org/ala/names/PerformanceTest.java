@@ -5,8 +5,10 @@ import au.org.ala.bayesian.MatchMeasurement;
 import au.org.ala.bayesian.MatchOptions;
 import au.org.ala.location.AlaLocationClassification;
 import au.org.ala.util.JsonUtils;
+import au.org.ala.vocab.TaxonomicStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gbif.dwc.terms.Term;
 import org.gbif.nameparser.api.Rank;
 import org.gbif.utils.file.csv.CSVReader;
@@ -37,10 +39,10 @@ public class PerformanceTest {
 
     public static final int SEARCH_QUERY_LIMIT = 15;
     public static final int SEARCH_CACHE_SIZE = 10000;
-    public static final String INDEX = "/data/lucene/index-20230725-5" ;
-    public static final String VERNACULAR_INDEX = "/data/lucene/vernacular-20230725-5" ;
+    public static final String INDEX = "/data/lucene/linnaean-2025-1-3" ;
+    public static final String VERNACULAR_INDEX = "/data/lucene/vernacular-2025-1-3" ;
     public static final String LOCATION_INDEX = "/data/lucene/location-20230725-5";
-    public static final String SUGGESTER_INDEX = "/data/tmp/suggester-20230725-5";
+    public static final String SUGGESTER_INDEX = "/data/tmp/suggester-2025-1-3";
 
     /**
      * The potential columns in the source data.
@@ -49,6 +51,7 @@ public class PerformanceTest {
     private static final String[] COLUMNS = new String[]{
             "count", // Number of instances with this raw input
             "match", // Expected match name
+            "accepted", // Expected accepted name
             "valid", // Expected validity
             "scientificName",
             "scientificNameAuthorship",
@@ -128,6 +131,7 @@ public class PerformanceTest {
         int accurateWeighted = 0;
         int cleanWeighted = 0;
         Map<Term, Integer> issueCount = new HashMap<>();
+        Map<Pair<TaxonomicStatus, TaxonomicStatus>, Integer> statusCount = new HashMap<>();
         long startTime, endTime;
         try {
             s = this.getClass().getResourceAsStream(name);
@@ -198,6 +202,9 @@ public class PerformanceTest {
                     if (match.isValid()) {
                         succcess++;
                         succcessWeighted += count;
+                        final Pair<TaxonomicStatus, TaxonomicStatus> sp = Pair.of(match.getMatch().taxonomicStatus, match.getAccepted().taxonomicStatus);
+                        int sc = statusCount.getOrDefault(sp, 0);
+                        statusCount.put(sp, sc + 1);
                         String cleanName = linnaean.scientificName;
                         if (cleanName.equalsIgnoreCase(match.getMatch().scientificName)) {
                             clean++;
@@ -233,7 +240,7 @@ public class PerformanceTest {
                             accurate++;
                             accurateWeighted += count;
                         } else
-                            logger.warn("Unexpected match on line {}, got <<{}>> not <<{}>> on {}", line, match.getMatch().scientificName, searchName, row);
+                            logger.warn("Unexpected match on line {}, got <<{}>> - {} - <<{}>> not <<{}>> on {}", line, match.getMatch().scientificName, match.getMatch().taxonId, match.getAccepted().scientificName, searchName, row);
                     }
                     if (expectValid == match.isValid()) {
                         expected++;
@@ -269,6 +276,11 @@ public class PerformanceTest {
             logger.info("Expected match rate " + expectedRate + " weighted " + expectedRateWeighted);
             logger.info("Accurate match rate " + accurateRate + " weighted " + accurateRateWeighted);
             logger.info("Clean match rate " + cleanRate + " weighted " + cleanRateWeighted);
+            logger.info("Match Taxonomic Status");
+            for (Map.Entry<Pair<TaxonomicStatus, TaxonomicStatus>, Integer> entry : statusCount.entrySet()) {
+                logger.info("  " + entry.getKey().toString() + ": " + entry.getValue());
+            }
+            logger.info("Issues");
             for (Map.Entry<Term, Integer> entry : issueCount.entrySet()) {
                 logger.info(entry.getKey().toString() + ": " + entry.getValue());
             }

@@ -78,6 +78,7 @@
                             <generateClassification>false</generateClassification>
                             <generateFactory>false</generateFactory>
                             <analyserClass>au.org.ala.names.AlaNameAnalyser</analyserClass>
+                            <buildAnalyserClass>au.org.ala.names.AlaNameBuildAnalyser</buildAnalyserClass>
                             <weightAnalyserClass>au.org.ala.names.AlaWeightAnalyser</weightAnalyserClass>
                         </configuration>
                     </execution>
@@ -96,6 +97,7 @@
                             <generateClassification>false</generateClassification>
                             <generateFactory>false</generateFactory>
                             <analyserClass>au.org.ala.names.AlaVernacularAnalyser</analyserClass>
+                            <buildAnalyserClass>au.org.ala.names.AlaVernacularBuildAnalyser</buildAnalyserClass>
                         </configuration>
                     </execution>
                 <execution>
@@ -113,6 +115,7 @@
                         <generateClassification>false</generateClassification>
                         <generateFactory>false</generateFactory>
                         <analyserClass>au.org.ala.location.AlaLocationAnalyser</analyserClass>
+                        <buildAnalyserClass>au.org.ala.location.AlaLocationBuildAnalyser</buildAnalyserClass>
                         <weightAnalyserClass>au.org.ala.location.AlaLocationWeightAnalyser</weightAnalyserClass>
                     </configuration>
                 </execution>

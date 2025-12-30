@@ -38,6 +38,7 @@ public class AlaLocationBuilderTest extends TestUtils {
         config.setNetwork(AlaLocationBuilder.class.getResource("/ala-location.json"));
         config.setWork(work);
         config.setFactoryClass(AlaLocationFactory.class);
+        config.setBuildAnalyserClass(AlaLocationBuildAnalyser.class);
         builder = new IndexBuilder<AlaLocationClassification, AlaLocationInferencer, AlaLocationFactory, LuceneClassifier>(config);
         Source source = Source.create(AlaLocationBuilderTest.class.getResource("/location-1.zip"), AlaLocationFactory.instance(), AlaLocationFactory.instance().getObservables(), config.getTypes());
         builder.load(source);

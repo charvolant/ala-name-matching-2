@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -89,6 +90,19 @@ public abstract class Modifier extends Identifiable {
     abstract public Set<Observable> getConditions();
 
     /**
+     * Get all the modifiers that are part of this modifier.
+     * <p>
+     * Composite modifiers may contain sub-modifiers
+     * </p>
+     *
+     * @return The full set of modifiers
+     */
+    @JsonIgnore
+    public List<Modifier> getAllModifiers() {
+        return Collections.singletonList(this);
+    }
+
+    /**
      * Can we proceed with any conditonal variable being true or must we have all of them?
      *
      * @return True if any variable being present allows the modifier
@@ -150,16 +164,10 @@ public abstract class Modifier extends Identifiable {
      * @throws BayesianException if unable to genereate code
      */
     public void generateConditions(NetworkCompiler compiler, String from, String to, List<String> statements) throws BayesianException {
-        final String check = this.buildCheck(compiler, from, false);
-        if (check == null)
-            return;
-        StringBuilder statement = new StringBuilder();
-        statement.append("if (");
-        statement.append(check);
-        statement.append(") return ");
-        statement.append(from);
-        statement.append(";");
-        statements.add(statement.toString());
+        String check = this.buildCheck(compiler, from, false);
+        if (check != null && !check.isEmpty()) {
+            statements.add("if (" + check + ") return " + from + ";");
+        }
     }
 
     /**
@@ -214,7 +222,7 @@ public abstract class Modifier extends Identifiable {
     /**
      * Generate any code that needs to clean up after the modification
      * <p>
-     * By default, this does nothing.
+     * By default, this adds any issue that have come up.
      * </p>
      *
      * @param compiler The compiled network
@@ -230,7 +238,7 @@ public abstract class Modifier extends Identifiable {
     /**
      * Clear any dependent values.
      * <p>
-     * A utility method for use with {@link #generate(NetworkCompiler, String, String)}
+     * A utility method for use with {@link #generate(NetworkCompiler, String, String, boolean)}
      * </p>
      *
      * @param compiler The compiled network
@@ -247,25 +255,12 @@ public abstract class Modifier extends Identifiable {
      *
      * @param compiler The compiled network
      * @param var The variable to check
-     * @param positive True if this is a check to see if we whould use the modifier
+     * @param positive True if this is a check to see if we should use the modifier
      * @return The list of checks to perform
      *
      * @see #buildChecks(NetworkCompiler, String, boolean)
      */
-    public String buildCheck(NetworkCompiler compiler, String var, boolean positive) {
-        String precondition = null;
-        if (this.condition != null)
-            precondition = (positive ? "" : "!") + "(" + this.condition.buildCheck(compiler, var) + ")";
-        boolean any = (positive && this.getAnyCondition()) || (!positive && !this.getAnyCondition());
-        final String connector = (positive && this.getAnyCondition()) || (!positive && !this.getAnyCondition()) ? " || " : " && ";
-        List<String> checks = this.buildChecks(compiler, var, positive);
-        if (checks == null || checks.isEmpty())
-            return precondition;
-        String check = checks.stream().collect(Collectors.joining(any ? " || " : " && "));
-        if (precondition != null)
-            check = precondition + (positive ? " && " : " || ") + "(" + check + ")";
-        return check;
-    }
+    abstract public String buildCheck(NetworkCompiler compiler, String var, boolean positive);
 
     /**
      * Generate a list of tests to see whether we should run this modifier.
@@ -278,8 +273,8 @@ public abstract class Modifier extends Identifiable {
      * @param positive True if this is a check to see if we whould use the modifier
      * @return The list of checks to perform
      */
-    public List<String> buildChecks(NetworkCompiler compiler, String var, boolean positive) {
+    public Set<String> buildChecks(NetworkCompiler compiler, String var, boolean positive) {
         final String test = positive ? "!=" : "==";
-        return this.getConditions().stream().map(o -> var + "." + o.getJavaVariable() + " " + test + " null").collect(Collectors.toList());
+        return this.getConditions().stream().map(o -> var + "." + o.getJavaVariable() + " " + test + " null").collect(Collectors.toSet());
     }
 }

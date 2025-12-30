@@ -19,6 +19,7 @@ public class ${className} extends AbstractCli<${classificationClassName}, ${buil
     IndexBuilderConfiguration configuration = new IndexBuilderConfiguration();
     configuration.setBuilderClass(${builderClassName}.class);
     configuration.setFactoryClass(${factoryClassName}.class);
+    configuration.setBuildAnalyserClass(${buildanalyserImplementationClassName}.class);
     configuration.setWeightAnalyserClass(${weightImplementationClassName}.class);
     configuration.setNetwork(${builderClassName}.class.getResource("${networkFileName}"));
     configuration.setTypes(Arrays.asList(${factoryClassName}.CONCEPT));

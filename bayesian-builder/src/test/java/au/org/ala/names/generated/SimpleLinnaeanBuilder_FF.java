@@ -5,6 +5,7 @@ import au.org.ala.bayesian.BayesianException;
 import au.org.ala.bayesian.Classifier;
 import au.org.ala.bayesian.ParameterAnalyser;
 import au.org.ala.bayesian.Parameters;
+import au.org.ala.names.builder.BuildAnalyser;
 import au.org.ala.names.builder.Builder;
 
 import java.util.Arrays;
@@ -28,27 +29,27 @@ public class SimpleLinnaeanBuilder_FF implements Builder<SimpleLinnaeanClassific
   }
 
   @Override
-  public void generate(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void generate(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public void interpret(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void interpret(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public void infer(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void infer(Classifier classifier, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public void expand(Classifier classifier, Deque<Classifier> parents, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 
   @Override
-  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<SimpleLinnaeanClassification> analyser) throws BayesianException {
+  public Function<Classifier, Boolean> getBroadener(Classifier document, Analyser<SimpleLinnaeanClassification> analyser, BuildAnalyser<SimpleLinnaeanClassification> buildAnalyser) throws BayesianException {
     throw new UnsupportedOperationException("Sub-builders do not support this operation");
   }
 

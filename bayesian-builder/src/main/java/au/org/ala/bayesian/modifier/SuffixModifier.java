@@ -112,7 +112,7 @@ public class SuffixModifier extends BaseModifier {
      * @param positive True if this is a check to see if we whould use the modifier
      * @return The list of checks to perform
      */
-    public List<String> buildChecks(NetworkCompiler compiler, String var, boolean positive) {
+    public Set<String> buildChecks(NetworkCompiler compiler, String var, boolean positive) {
         final String test = positive ? "!=" : "==";
         final String connector = positive ? " && !" : " || ";
         return this.getConditions().stream()
@@ -122,7 +122,7 @@ public class SuffixModifier extends BaseModifier {
                         + var + "." + o.getJavaVariable() + ".toLowerCase().endsWith(\"" + this.suffix.toLowerCase()
                         + "\"))"
                 )
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
 }

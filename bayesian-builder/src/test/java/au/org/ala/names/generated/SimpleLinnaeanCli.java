@@ -15,6 +15,7 @@ public class SimpleLinnaeanCli extends AbstractCli<SimpleLinnaeanClassification,
     IndexBuilderConfiguration configuration = new IndexBuilderConfiguration();
     configuration.setBuilderClass(SimpleLinnaeanBuilder.class);
     configuration.setFactoryClass(SimpleLinnaeanFactory.class);
+    configuration.setBuildAnalyserClass(au.org.ala.names.builder.NullBuildAnalyser.class);
     configuration.setWeightAnalyserClass(au.org.ala.names.builder.DefaultWeightAnalyser.class);
     configuration.setNetwork(SimpleLinnaeanBuilder.class.getResource("simple-linnaean.json"));
     configuration.setTypes(Arrays.asList(SimpleLinnaeanFactory.CONCEPT));

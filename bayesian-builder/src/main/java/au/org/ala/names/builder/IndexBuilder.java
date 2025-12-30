@@ -97,7 +97,9 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
     private final LoadStore<Cl> loader;
     /** The analyser. Used to add extra information to loaded classifiers. Accessed via the annotation interface */
     protected Analyser<C> analyser;
-    /** The wight analyser, used to compute the weight of a classifier */
+    /** The build analyser. Used to decide what should be included during index building but not required during index lookup */
+    protected BuildAnalyser<C> buildAnalyser;
+    /** The weight analyser, used to compute the weight of a classifier */
     @Getter
     protected WeightAnalyser weightAnalyser;
     /** The identifiers used. Non-unique identifiers are disambiguated */
@@ -122,6 +124,7 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
         this.factory = config.createFactory(this);
         this.builder = config.createBuilder(this.factory);
         this.analyser = this.factory.createAnalyser(this.config.getAnalyserConfig());
+        this.buildAnalyser = config.createBuildAnalyser(this);
         this.weightAnalyser = config.createWeightAnalyser(this.network);
         if (this.network.getConcept() == null)
             throw new BuilderException("Network requires concept term");
@@ -235,10 +238,10 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
                 target,
                 c -> {
                     try {
-                        this.builder.generate(c, this.analyser);
+                        this.builder.generate(c, this.analyser, this.buildAnalyser);
                         this.annotate(c);
                         this.buildNames(c);
-                        this.builder.interpret(c, this.analyser);
+                        this.builder.interpret(c, this.analyser, this.buildAnalyser);
                         return c;
                     } catch (BayesianException ex) {
                         throw new IllegalArgumentException("Unable to process " + c.get(this.identifier), ex);
@@ -262,12 +265,12 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
         Set<String> altNames = new LinkedHashSet<>();
 
         // Add all possible names something could be seen as
-        names.addAll(this.analyser.analyseNames(classifier, this.name, this.fullName, this.disabiguator, true));
+        names.addAll(this.buildAnalyser.analyseNames(classifier, this.name, this.fullName, this.disabiguator, true));
         classifier.setNames(names);
 
         // Add alternative names
         if (this.altName.isPresent()) {
-            altNames.addAll(this.analyser.analyseNames(classifier, this.name, this.fullName, this.disabiguator,false).stream()
+            altNames.addAll(this.buildAnalyser.analyseNames(classifier, this.name, this.fullName, this.disabiguator,false).stream()
                     .filter(n -> !names.contains(n))
                     .collect(Collectors.toSet()));
         }
@@ -328,8 +331,8 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
         String id = classifier.get(this.identifier);
         Iterable<Cl> synonyms = source.getAll(this.conceptTerm, new Observation(true, this.accepted.get(), id));
         for (Cl synonym : synonyms) {
-            if (this.analyser.acceptSynonym(classifier, synonym)) {
-                synonymNames.addAll(this.analyser.analyseNames(synonym, this.name, this.fullName, this.disabiguator, true));
+            if (this.buildAnalyser.acceptSynonym(classifier, synonym)) {
+                synonymNames.addAll(this.buildAnalyser.analyseNames(synonym, this.name, this.fullName, this.disabiguator, true));
             }
         }
         if (!this.synonymName.get().getMultiplicity().isMany() && synonymNames.size() > 1) {
@@ -373,7 +376,7 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
 
     @SneakyThrows
     public Cl broaden(Cl classifier, LoadStore<Cl> source) {
-        Function<Classifier, Boolean> broadener = this.builder.getBroadener(classifier, this.analyser);
+        Function<Classifier, Boolean> broadener = this.builder.getBroadener(classifier, this.analyser, this.buildAnalyser);
         if (broadener == null)
             return classifier;
         Set<String> broadenedNames = new LinkedHashSet<String>();
@@ -499,7 +502,7 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
         int left = index;
         String id = classifier.get(this.identifier);
         // Perform all derivations
-        this.builder.expand(classifier, parents, this.analyser);
+        this.builder.expand(classifier, parents, this.analyser, this.buildAnalyser);
         List<String> trail = parents.stream().map(p -> p.get(this.identifier)).collect(Collectors.toList());
         Collections.reverse(trail);
         classifier.setTrail(trail);
@@ -591,8 +594,8 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
                 target,
                 c -> {
                     try {
-                        this.analyser.analyseForIndex(c);
-                        this.builder.infer(c, this.analyser);
+                        this.buildAnalyser.analyseForIndex(c);
+                        this.builder.infer(c, this.analyser, this.buildAnalyser);
                         return c;
                     } catch (BayesianException ex) {
                         throw new IllegalArgumentException("Unable to process " + c.get(this.identifier), ex);
