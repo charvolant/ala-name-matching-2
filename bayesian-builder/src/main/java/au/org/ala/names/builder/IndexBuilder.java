@@ -359,7 +359,7 @@ public class IndexBuilder<C extends Classification<C>, I extends Inferencer<C>, 
      */
     public LoadStore<Cl> broaden(LoadStore<Cl> source) throws BayesianException {
         if (!this.broadSynonymName.isPresent() || !this.parent.isPresent()) {
-            logger.info("No terms to boraded");
+            logger.info("No terms to broadened");
             return source;
         }
         final LoadStore<Cl> target = this.createWorkStore("broadened");

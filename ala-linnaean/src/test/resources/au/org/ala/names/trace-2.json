@@ -88,14 +88,14 @@
           }
         },
         "probability" : {
-          "prior" : 3.7923703839821924E-6,
-          "evidence" : 3.7555222258621016E-6,
-          "conditional" : 0.9902833403496804,
-          "posterior" : 0.9999997299525991
+          "prior" : 3.7923561417090936E-6,
+          "evidence" : 3.7555081219685563E-6,
+          "conditional" : 0.990283340349534,
+          "posterior" : 0.9999997299535052
         },
         "fidelity" : null,
-        "left" : 265437,
-        "right" : 265441,
+        "left" : 264832,
+        "right" : 264836,
         "issues" : [ "http://ala.org.au/issues/1.0/acceptedAndSynonym", "http://ala.org.au/issues/1.0/removedFamily" ]
       },
       "children" : [ {

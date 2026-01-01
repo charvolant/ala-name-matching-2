@@ -1,9 +1,6 @@
 package au.org.ala.bayesian.condition;
 
-import au.org.ala.bayesian.Condition;
-import au.org.ala.bayesian.NetworkCompiler;
-import au.org.ala.bayesian.Observable;
-import au.org.ala.bayesian.StoreException;
+import au.org.ala.bayesian.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -18,6 +15,20 @@ public class ValueCondition extends Condition {
     @JsonProperty
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String value;
+
+    /**
+     * Test to see if a value is present
+     *
+     * @param classifier The classifier
+     *
+     * @return If the classifier has the observable with the correct value
+     *
+     * @throws BayesianException if unable to perform the check
+     */
+    @Override
+    public boolean check(Classifier classifier) throws BayesianException {
+        return classifier.matchClean(this.source.getAnalysis().fromString(this.value, null), this.source);
+    }
 
     /**
      * Generate a positive check that matches this condition for a classification.

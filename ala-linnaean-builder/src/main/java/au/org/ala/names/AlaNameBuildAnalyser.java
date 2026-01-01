@@ -12,6 +12,8 @@ import org.gbif.nameparser.api.Rank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,10 +22,10 @@ import java.util.stream.Collectors;
 public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClassification> implements BuildAnalyser<AlaLinnaeanClassification> {
     private final Logger logger = LoggerFactory.getLogger(AlaNameBuildAnalyser.class);
 
-    /** The key for the excluded parsable names */
-    public static final String PARSE_DATASET_EXCLUDE = "analyser.parse.dataset.exclude";
-    /** The key for the excluded synonyms */
-    public static final String SYNONYM_DATASET_EXCLUDE = "analyser.synonym.dataset.exclude";
+    /** The key for parsable names */
+    public static final String PARSE_CONDITION = "analyser.parse.condition";
+    /** The key for synonyms */
+    public static final String SYNONYM_CONDITION = "analyser.synonym.condition";
     /** The distance in ranks allowable when looking at synonyms */
     public static final int SYNONYM_RANK_DISTANCE = 2000;
 
@@ -40,28 +42,27 @@ public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClas
      */
     public static final Pattern NUMERIC_PLACEHOLDER = Pattern.compile("^([A-Z][a-z]+)\\s(?:(?:" + RANK_MARKERS + ")\\.?\\s?)?(?:[A-Z]|\\d+)$");
 
-
     /** Datasets to exclude from parsing */
-    private Set<String> parseDatasetExclude = new HashSet<>();
+    private Condition parseCondition = null;
 
     /** Datasets to exclude from potential synonym names */
-    private Set<String> synonymDatasetExclude = new HashSet<>();
+    private Condition synonymCondition = null;
 
     /**
      * Construct for a configuration
      *
      * @param config The configuration
+     *
+     * @throws IOException if unable to read configuration data
      */
-    public AlaNameBuildAnalyser(AnalyserConfig config) {
+    public AlaNameBuildAnalyser(AnalyserConfig config) throws IOException {
         super(config);
-        String parseEx = config.getParameter(PARSE_DATASET_EXCLUDE, "");
-        if (!parseEx.isEmpty()) {
-            parseDatasetExclude = Arrays.asList(parseEx.split(",")).stream().map(String::toUpperCase).collect(Collectors.toSet());
-        }
-        String synonymEx = config.getParameter(SYNONYM_DATASET_EXCLUDE, "");
-        if (!synonymEx.isEmpty()) {
-            synonymDatasetExclude = Arrays.asList(synonymEx.split(",")).stream().map(String::toUpperCase).collect(Collectors.toSet());
-        }
+        URL pc = config.getURL(PARSE_CONDITION, null);
+        if (pc != null)
+            this.parseCondition = Condition.load(pc);
+        URL sc = config.getURL(SYNONYM_CONDITION, null);
+        if (sc != null)
+            this.synonymCondition = Condition.load(pc);
     }
 
     /**
@@ -315,7 +316,6 @@ public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClas
     @Override
     public void analyseForIndex(Classifier classifier) throws InferenceException, StoreException {
         String id = classifier.get(AlaLinnaeanFactory.taxonId);
-        String datasetId = classifier.get(AlaLinnaeanFactory.datasetId);
         String scientificName = classifier.get(AlaLinnaeanFactory.scientificName);
         String scientificNameAuthorshup = classifier.get(AlaLinnaeanFactory.scientificNameAuthorship);
         Analysis analysis = new Analysis(
@@ -338,11 +338,14 @@ public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClas
         this.processSpeciesNovum(analysis, true, null, null);
         this.processPhraseName(analysis, null);
         this.processEmbeddedAuthor(analysis, CANONICAL_MODIFICATION, null);
-        if (datasetId != null && this.parseDatasetExclude.contains(datasetId.toUpperCase())) {
-            analysis.setNameType(NameType.INFORMAL);
-            analysis.setParsedName(null);
-        } else {
-            this.parseName(analysis, UNPARSABLE_ISSUES);
+        analysis.setNameType(NameType.INFORMAL);
+        analysis.setParsedName(null);
+        try {
+            if (this.parseCondition == null || this.parseCondition.check(classifier)) {
+                this.parseName(analysis, UNPARSABLE_ISSUES);
+            }
+        } catch (BayesianException ex) {
+            this.logger.error("Unable to test parse condition on " + id, ex);
         }
         this.processParsedScientificName(analysis, CANONICAL_MODIFICATION, null);
         this.processTrinomial(analysis, CANONICAL_MODIFICATION);
@@ -393,7 +396,6 @@ public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClas
         NomenclaturalCode code = classifier.get(AlaLinnaeanFactory.nomenclaturalCode);
         String scientificName = classifier.get(name);
         String scientificNameAuthorship = classifier.get(AlaLinnaeanFactory.scientificNameAuthorship);
-        String datasetId = classifier.get(AlaLinnaeanFactory.datasetId);
 
         Analysis analysis = new Analysis(scientificName, scientificNameAuthorship, rank, code, MatchOptions.ALL);
 
@@ -419,11 +421,14 @@ public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClas
             this.processSpeciesNovum(sub, true, null, null);
             this.processPhraseName(sub, null);
             this.processEmbeddedAuthor(analysis, null, null);
-            if (datasetId != null && this.parseDatasetExclude.contains(datasetId.toUpperCase())) {
-                sub.setNameType(NameType.INFORMAL);
-                sub.setParsedName(null);
-            } else {
-                this.parseName(sub, null);
+            sub.setNameType(NameType.INFORMAL);
+            sub.setParsedName(null);
+            try {
+                if (this.parseCondition == null || this.parseCondition.check(classifier)) {
+                    this.parseName(sub, UNPARSABLE_ISSUES);
+                }
+            } catch (BayesianException ex) {
+                this.logger.warn("Unable to test parse condition on " + name, ex);
             }
             if (sub.getParsedName() != null) {
                 this.processParsedScientificName(sub, null, null);
@@ -461,7 +466,12 @@ public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClas
      */
     @Override
     public boolean acceptSynonym(Classifier base, Classifier candidate) {
-        return synonymInRange(base, candidate) && !synonymExclude(base, candidate);
+        try {
+            return synonymInRange(base, candidate) && (this.synonymCondition == null || this.synonymCondition.check(candidate));
+        } catch (BayesianException ex) {
+            this.logger.error("Unable to test syonym condition for " + candidate, ex);
+            return false;
+        }
     }
 
     /**
@@ -487,21 +497,6 @@ public class AlaNameBuildAnalyser extends ScientificNameAnalyser<AlaLinnaeanClas
         int classificationRankID = RankIDAnalysis.idFromRank(baseRank);
         int candidateRankID = RankIDAnalysis.idFromRank(candidateRank);
         return Math.abs(classificationRankID - candidateRankID) < SYNONYM_RANK_DISTANCE;
-    }
-
-    /**
-     * See if a synonym should be excluded
-     * <p>
-     * Based on a list of unwanted data sources
-     * </p>
-     *
-     * @param base The classifier the synonym is for
-     * @param candidate      The classifier for the synonym
-     * @return True if this is an in-range synonym.
-     */
-    protected boolean synonymExclude(Classifier base, Classifier candidate) {
-        String datasetID = candidate.has(AlaLinnaeanFactory.datasetId) ? candidate.get(AlaLinnaeanFactory.datasetId) : null;
-        return datasetID != null && this.synonymDatasetExclude.contains(datasetID.toUpperCase());
     }
 
 }

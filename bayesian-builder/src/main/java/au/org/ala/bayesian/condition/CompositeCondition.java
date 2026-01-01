@@ -1,5 +1,7 @@
 package au.org.ala.bayesian.condition;
 
+import au.org.ala.bayesian.BayesianException;
+import au.org.ala.bayesian.Classifier;
 import au.org.ala.bayesian.Condition;
 import au.org.ala.bayesian.NetworkCompiler;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -41,6 +43,27 @@ public class CompositeCondition extends Condition {
     public CompositeCondition(boolean all, @NonNull List<Condition> conditions) {
         this.all = all;
         this.conditions = conditions;
+    }
+
+    /**
+     * Test a classifier
+     *
+     * @param classifier The classifier
+     *
+     * @return True if all/any of the sub-conditions are true, depending on the all flag
+     *
+     * @throws BayesianException if unable to perform the underlying test
+     */
+    @Override
+    public boolean check(Classifier classifier) throws BayesianException {
+        for (Condition c: this.conditions) {
+            boolean v = c.check(classifier);
+            if (v && !this.all)
+                return true;
+            if (!v && this.all)
+                return false;
+        }
+        return true;
     }
 
     /**

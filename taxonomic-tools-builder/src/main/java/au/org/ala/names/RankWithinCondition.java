@@ -1,8 +1,6 @@
 package au.org.ala.names;
 
-import au.org.ala.bayesian.Condition;
-import au.org.ala.bayesian.NetworkCompiler;
-import au.org.ala.bayesian.Observable;
+import au.org.ala.bayesian.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -13,7 +11,7 @@ public class RankWithinCondition extends Condition {
     /** The observable that holds the rank */
     @JsonProperty
     @Getter
-    private Observable source;
+    private Observable<Rank> source;
     /** The high range that the rank needs to be within */
     @JsonProperty
     @JsonSerialize(using = RankAnalysis.Serializer.class)
@@ -49,6 +47,29 @@ public class RankWithinCondition extends Condition {
         this.upper = upper;
         this.lower = lower;
         this.allowUnknown = allowUnknown;
+    }
+
+    /**
+     * Check the classifier for a valid rank
+     *
+     * @param classifier The classifier
+     *
+     * @return True if the rank falls within the specified range
+     *
+     * @throws BayesianException
+     */
+    @Override
+    public boolean check(Classifier classifier) throws BayesianException {
+        Rank rank = classifier.get(this.source);
+        if (rank == null)
+            return false;
+        if (rank.otherOrUnranked())
+            return this.allowUnknown;
+        if (this.lower != null && rank.lowerThan(this.lower))
+            return false;
+        if (this.upper != null && rank.higherThan(this.upper))
+            return false;
+        return true;
     }
 
     /**

@@ -1,8 +1,6 @@
 package au.org.ala.bayesian.condition;
 
-import au.org.ala.bayesian.Condition;
-import au.org.ala.bayesian.NetworkCompiler;
-import au.org.ala.bayesian.Observable;
+import au.org.ala.bayesian.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NonNull;
@@ -41,6 +39,23 @@ public class PresentCondition extends Condition {
     public PresentCondition(boolean all, @NonNull List<Observable> present) {
         this.all = all;
         this.present = present;
+    }
+
+    /**
+     * Test to see if the observables are present
+     *
+     * @param classifier The classifier
+     *
+     * @return True if all/any observables are present, depending on the all flag
+     *
+     * @throws BayesianException if unable to perform the underlying test
+     */
+    @Override
+    public boolean check(Classifier classifier) throws BayesianException {
+        if (this.all)
+            return this.present.stream().allMatch(o -> classifier.has(o));
+        else
+            return this.present.stream().anyMatch(o -> classifier.has(o));
     }
 
     /**

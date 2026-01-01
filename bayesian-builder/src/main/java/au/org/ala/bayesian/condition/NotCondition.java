@@ -1,5 +1,7 @@
 package au.org.ala.bayesian.condition;
 
+import au.org.ala.bayesian.BayesianException;
+import au.org.ala.bayesian.Classifier;
 import au.org.ala.bayesian.Condition;
 import au.org.ala.bayesian.NetworkCompiler;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,6 +29,20 @@ public class NotCondition extends Condition {
      */
     public NotCondition(Condition condition) {
         this.condition = condition;
+    }
+
+    /**
+     * Test a classifier
+     *
+     * @param classifier The classifier
+     *
+     * @return True if the underlying condition is false
+     *
+     * @throws BayesianException if unable to perform the underlying test
+     */
+    @Override
+    public boolean check(Classifier classifier) throws BayesianException {
+        return !this.condition.check(classifier);
     }
 
     /**

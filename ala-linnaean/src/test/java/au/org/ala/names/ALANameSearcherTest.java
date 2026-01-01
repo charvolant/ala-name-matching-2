@@ -2512,7 +2512,7 @@ public class ALANameSearcherTest {
         template.scientificName = "Elaeocarpus sp. Rocky Creek";
         Match<AlaLinnaeanClassification, MatchMeasurement> result = this.searcher.search(template);
         assertTrue(result.isValid());
-        assertEquals("https://id.biodiversity.org.au/instance/apni/871108", result.getMatch().taxonId); // Variable
+        assertEquals("https://id.biodiversity.org.au/instance/apni/871103", result.getMatch().taxonId); // Variable
         assertEquals("https://id.biodiversity.org.au/taxon/apni/51765606", result.getAccepted().taxonId);
         assertEquals(Issues.of(AlaLinnaeanFactory.SYNTHETIC_MATCH, AlaLinnaeanFactory.BARE_PHRASE_NAME), result.getIssues());
     }
